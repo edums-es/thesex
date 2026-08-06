@@ -26,6 +26,7 @@ require(ABSPATH . 'includes/functions.php');
 // check config file
 if (!file_exists(ABSPATH . 'includes/config.php')) {
   header('Location: ./install');
+  exit;
 }
 
 

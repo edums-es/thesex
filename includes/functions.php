@@ -24,7 +24,7 @@ function check_system_requirements()
   /* set required php version*/
   $required_php_version = '8.4';
   /* check php version */
-  if (version_compare($required_php_version, PHP_VERSION, '>=')) {
+  if (version_compare(PHP_VERSION, $required_php_version, '<')) {
     $errors['PHP'] = true;
   }
   /* check if mysqli enabled */
