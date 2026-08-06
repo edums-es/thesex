@@ -1,0 +1,12 @@
+# Runtime configuration and secrets
+/includes/config.php
+
+# Dependency directories restored by package managers
+/node_modules/
+
+# Local installation archive
+/Script.zip
+
+# Generated uploads and temporary media
+/content/uploads/temp/*
+!/content/uploads/temp/index.html
