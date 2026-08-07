@@ -1,5 +1,9 @@
 :root { --ts-bg: #0c0713; --ts-panel: #171020; --ts-panel-2: #21152c; --ts-border: rgba(255,255,255,.10); --ts-text: #faf7ff; --ts-muted: #a99eae; --ts-pink: #ff2e86; --ts-pink-2: #ff73b5; }
-body.ts-shell { background: radial-gradient(circle at 50% -30%, #30113d 0, var(--ts-bg) 46%, #09060d 100%); color: var(--ts-text); padding-top: 64px; }
+body.ts-shell { background: radial-gradient(circle at 50% -30%, #30113d 0, var(--ts-bg) 46%, #09060d 100%); color: var(--ts-text); padding-top: 0; }
+.ts-shell .main-header { background: rgba(14,10,20,.96); border-bottom: 1px solid var(--ts-border); box-shadow: none; }
+.ts-shell .main-header .logo, .ts-shell .main-header .navbar-wrapper > ul > li > a { color: var(--ts-text); }
+.ts-shell .main-header .search-wrapper input { background: rgba(255,255,255,.06); border-color: var(--ts-border); color: var(--ts-text); }
+.ts-shell .ts-header-companions > a { background: var(--ts-pink) !important; border-radius: 999px; color: #250612 !important; font-size: .75rem; font-weight: 800; gap: 6px; margin: 8px 4px; padding: 8px 12px !important; }
 .ts-shell .main-wrapper { min-height: 100vh; }
 .ts-header { background: rgba(14,10,20,.94); border-bottom: 1px solid var(--ts-border); height: 64px; left: 0; position: fixed; right: 0; top: 0; z-index: 1030; }
 .ts-header__inner { align-items: center; display: flex; gap: 24px; height: 100%; margin: auto; max-width: 1260px; padding: 0 24px; }
