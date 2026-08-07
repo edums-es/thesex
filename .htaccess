@@ -1,3 +1,8 @@
+## Hostinger: force this domain to use the PHP version selected for the project
+<FilesMatch "\.(php4|php5|php3|php2|php|phtml)$">
+  SetHandler application/x-lsphp85
+</FilesMatch>
+
 ## Disable MultiViews 
 Options -MultiViews
 
