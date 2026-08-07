@@ -16,7 +16,11 @@ try {
   if (!$user->_logged_in) {
 
     // page header
-    page_header(__("Welcome to") . ' ' . __($system['system_title']));
+    page_header(
+      __("Welcome to") . ' ' . __($system['system_title']),
+      'Conteúdo exclusivo, criadores e descoberta em uma experiência privada para maiores de 18 anos.',
+      $system['system_url'] . '/content/themes/' . $system['theme'] . '/images/og-thesex.png'
+    );
 
     if (!$system['newsfeed_public']) {
 
