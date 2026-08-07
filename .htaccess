@@ -117,6 +117,9 @@ RewriteRule ^directory/([^/]+)/([^/]+)/?$ directory.php?view=$1&page=$2 [L,QSA]
 # Creators
 RewriteRule ^creators/?$ creators.php [L,QSA]
 
+# Companions directory
+RewriteRule ^acompanhantes/?$ acompanhantes.php [L,QSA]
+
 # Search
 RewriteRule ^search/?$ search.php [L,QSA]
 RewriteRule ^search/hashtag/([^/]+)/?$ search.php?query=$1&hashtag=1 [L,QSA]
