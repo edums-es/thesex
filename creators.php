@@ -46,7 +46,9 @@ try {
       WHERE node_type = 'profile'
       GROUP BY node_id
     ) AS subscriptions ON subscriptions.node_id = users.user_id
-    WHERE users.user_banned = '0' AND users.user_monetization_enabled = '1'
+    WHERE users.user_banned = '0'
+      AND users.user_activated = '1'
+      AND users.user_monetization_enabled = '1'
     ORDER BY users.user_verified DESC, subscribers_count DESC, users.user_id DESC
     LIMIT 24");
 

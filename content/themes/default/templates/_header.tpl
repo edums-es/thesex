@@ -123,6 +123,15 @@
                     <div class="navbar-wrapper">
                       <ul>
                         {if $user->_logged_in}
+                          <!-- companions discovery -->
+                          <li class="d-none d-xxl-block">
+                            <a class="creator-nav-link" href="{$system['system_url']}/acompanhantes">
+                              <i class="fa fa-location-dot"></i>
+                              <span>{__("Companions")}</span>
+                            </a>
+                          </li>
+                          <!-- companions discovery -->
+
                           <!-- add -->
                           <li class="d-none d-xxl-block dropdown">
                             <a href="#" data-bs-toggle="dropdown" data-display="static">

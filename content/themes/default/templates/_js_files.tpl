@@ -523,6 +523,7 @@
   {if $user->_logged_in}
     <script src="{$system['system_url']}/includes/assets/js/core/user.js?v={$system['system_version']}-{filemtime('includes/assets/js/core/user.js')}"></script>
     <script src="{$system['system_url']}/includes/assets/js/core/post.js?v={$system['system_version']}-{filemtime('includes/assets/js/core/post.js')}"></script>
+    <script src="{$system['system_url']}/content/themes/{$system['theme']}/js/creator-experience.js?v={$system['system_version']}-{filemtime('content/themes/default/js/creator-experience.js')}"></script>
     {if $system['chat_enabled']}
       {if $system['chat_socket_enabled']}
         {if $system['chat_socket_server'] == "php"}

@@ -188,6 +188,18 @@
         <small class="text-muted">{__("explore")|upper}</small>
       </li>
 
+      <li class="creator-side-link {if $page == "creators"}active{/if}">
+        <a href="{$system['system_url']}/creators">
+          <i class="fa fa-crown fa-fw mr10"></i>{__("Creators")}
+        </a>
+      </li>
+
+      <li class="creator-side-link {if $page == "acompanhantes"}active{/if}">
+        <a href="{$system['system_url']}/acompanhantes">
+          <i class="fa fa-location-dot fa-fw mr10"></i>{__("Companions")}
+        </a>
+      </li>
+
       {if $user->_logged_in}
         <li {if $page == "people"}class="active" {/if}>
           <a href="{$system['system_url']}/people">

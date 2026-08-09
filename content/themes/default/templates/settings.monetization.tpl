@@ -147,31 +147,30 @@
               {__("Subscriptions Plans")}
             </label>
             <div class="col-md-9">
-              <div class="payment-plans">
+              <div class="payment-plans creator-plan-grid">
+                <div data-toggle="modal" data-url="monetization/controller.php?do=add_plan&node_id={$user->_data['user_id']}&node_type=profile" class="payment-plan creator-plan-card creator-plan-card--new">
+                  <div class="creator-plan-card__add"><i class="fa fa-plus"></i></div>
+                  <strong>{__("Add New")}</strong>
+                  <small>{__("Create a subscription tier")}</small>
+                </div>
                 {foreach $monetization_plans as $plan}
-                  <div class="payment-plan">
-                    <div class="text-xxlg">{__($plan['title'])}</div>
-                    <div class="text-xlg">{print_money($plan['price'])} / {if $plan['period_num'] != '1'}{$plan['period_num']}{/if} {__($plan['period']|ucfirst)}</div>
+                  <div class="payment-plan creator-plan-card">
+                    <div class="creator-plan-card__eyebrow">{__("Subscription plan")}</div>
+                    <div class="creator-plan-card__title">{__($plan['title'])}</div>
+                    <div class="creator-plan-card__price">{print_money($plan['price'])}<small> / {if $plan['period_num'] != '1'}{$plan['period_num']}{/if} {__($plan['period']|ucfirst)}</small></div>
                     {if {$plan['custom_description']}}
-                      <div>{$plan['custom_description']}</div>
+                      <div class="creator-plan-card__description">{$plan['custom_description']}</div>
                     {/if}
-                    <div class="mt10">
-                      <span class="text-link mr10 js_monetization-deleter" data-id="{$plan['plan_id']}">
-                        <i class="fa fa-trash-alt mr5"></i>{__("Delete")}
-                      </span>
-                      |
-                      <span data-toggle="modal" data-url="monetization/controller.php?do=edit_plan&id={$plan['plan_id']}" class="text-link ml10">
+                    <div class="creator-plan-card__actions">
+                      <button type="button" data-toggle="modal" data-url="monetization/controller.php?do=edit_plan&id={$plan['plan_id']}" class="btn btn-sm btn-light flex-grow-1">
                         <i class="fa fa-pen mr5"></i>{__("Edit")}
-                      </span>
+                      </button>
+                      <button type="button" class="btn btn-sm btn-light js_monetization-deleter" data-id="{$plan['plan_id']}" title='{__("Delete")}' aria-label='{__("Delete")}'>
+                        <i class="fa fa-trash-alt"></i>
+                      </button>
                     </div>
                   </div>
                 {/foreach}
-                <div data-toggle="modal" data-url="monetization/controller.php?do=add_plan&node_id={$user->_data['user_id']}&node_type=profile" class="payment-plan new">
-                  <div class="d-flex align-items-center justify-content-center">
-                    <i class="fa fa-plus mr5"></i>
-                    {__("Add New")}
-                  </div>
-                </div>
               </div>
             </div>
           </div>

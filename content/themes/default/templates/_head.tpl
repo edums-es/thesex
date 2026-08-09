@@ -56,6 +56,7 @@
       <link href="{$system['system_url']}/content/themes/{$system['theme']}/css/style.rtl.min.css?v={$system['system_version']}" rel="stylesheet">
     {/if}
     <link href="{$system['system_url']}/content/themes/{$system['theme']}/css/monetization.css?v={$system['system_version']}" rel="stylesheet">
+    <link href="{$system['system_url']}/content/themes/{$system['theme']}/css/creator-experience.css?v={$system['system_version']}-{filemtime('content/themes/default/css/creator-experience.css')}" rel="stylesheet">
     <!-- CSS -->
 
     <!-- CSS Customized -->

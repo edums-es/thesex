@@ -7,6 +7,9 @@
 # Local installation archive
 /Script.zip
 
+# Community packages kept locally as design/code references only
+/mods e addons/
+
 # Generated uploads and temporary media
 /content/uploads/temp/*
 !/content/uploads/temp/index.html

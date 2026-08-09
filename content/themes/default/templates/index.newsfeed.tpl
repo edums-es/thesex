@@ -48,9 +48,12 @@
 
               <!-- stories -->
               {if $user->_data['can_add_stories'] || ($system['stories_enabled'] && !empty($stories['array']))}
-                <div class="card">
+                <div class="card creator-stories-card">
                   <div class="card-header bg-transparent border-bottom-0">
-                    <strong class="text-muted">{__("Stories")}</strong>
+                    <div class="creator-stories-heading">
+                      <strong>{__("Stories")}</strong>
+                      <small>{__("Moments from creators you follow")}</small>
+                    </div>
                     {if $has_story}
                       <div class="float-end">
                         <button data-bs-toggle="tooltip" title='{__("Delete Your Story")}' class="btn btn-sm btn-icon btn-rounded btn-danger js_story-deleter">
@@ -62,11 +65,12 @@
                   <div class="card-body pt5 stories-wrapper">
                     <div id="stories" data-json='{htmlspecialchars($stories["json"], ENT_QUOTES, 'UTF-8')}'>
                       {if $user->_data['can_add_stories']}
-                        <div class="add-story" data-toggle="modal" data-url="posts/story.php?do=create">
+                        <div class="add-story add-story-banner" data-toggle="modal" data-url="posts/story.php?do=create">
                           <div class="img" style="background-image:url({$user->_data['user_picture']});">
                           </div>
-                          <div class="add">
-                            {include file='__svg_icons.tpl' icon="add" class="main-icon" width="18px" height="18px"}
+                          <div class="add-story-pill">
+                            <span class="add-story-pill__icon"><i class="fa fa-plus"></i></span>
+                            <span>{__("Create Story")}</span>
                           </div>
                         </div>
                       {/if}

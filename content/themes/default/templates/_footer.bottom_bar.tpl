@@ -10,23 +10,14 @@
       </div>
       <!-- home -->
 
-      <!-- watch -->
-      {if $system['reels_enabled']}
-        <div class="link {if $page == 'reels'}active{/if}">
-          <a href="{$system['system_url']}/reels">
-          {include file='__svg_icons.tpl' icon="reels" class="header-icon {if $page == "reels"}active{/if}" width="24px" height="24px"}
-          <div class="title">{__("Reels")}</div>
+      <!-- creators -->
+      <div class="link {if $page == 'creators'}active{/if}">
+        <a href="{$system['system_url']}/creators">
+          <i class="fa fa-crown fa-lg"></i>
+          <div class="title">{__("Creators")}</div>
         </a>
       </div>
-      {elseif $system['watch_enabled']}
-      <div class="link {if $page == 'index' && $view == 'watch'}active{/if}">
-        <a href="{$system['system_url']}/watch">
-          {include file='__svg_icons.tpl' icon="watch" class="header-icon {if $page == "index" && $view == "watch"}active{/if}" width="24px" height="24px"}
-          <div class="title">{__("Watch")}</div>
-        </a>
-      </div>
-      {/if}
-      <!-- watch -->
+      <!-- creators -->
 
       <!-- add -->
       <div class="link">
@@ -101,14 +92,14 @@
       </div>
       <!-- add -->
 
-      <!-- search -->
-      <div class="link {if $page == 'search'}active{/if}">
-        <a href="{$system['system_url']}/search">
-          {include file='__svg_icons.tpl' icon="header-search" class="header-icon {if $page == "search"}active{/if}" width="24px" height="24px"}
-          <div class="title">{__("Search")}</div>
+      <!-- companions -->
+      <div class="link {if $page == 'acompanhantes'}active{/if}">
+        <a href="{$system['system_url']}/acompanhantes">
+          <i class="fa fa-location-dot fa-lg"></i>
+          <div class="title">{__("Companions")}</div>
         </a>
       </div>
-      <!-- search -->
+      <!-- companions -->
 
       <!-- menu -->
       <div class="link">

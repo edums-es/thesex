@@ -3,18 +3,21 @@
 /**
  * companions discovery directory
  *
- * This page deliberately reuses the existing profile and monetization data.
- * It introduces no destructive database changes and is safe to disable by
- * removing the route or switching back to the default theme.
+ * Reuses public profile, location and monetization data. It does not create a
+ * second payment system and deliberately avoids exposing private locations.
  */
 
 require('bootloader.php');
 
 try {
   user_access();
-  $city = trim($_GET['city'] ?? '');
+  $city = mb_substr(trim($_GET['city'] ?? ''), 0, 64);
 
-  page_header('Acompanhantes | ' . __($system['system_title']), 'Perfis para descobrir por cidade');
+  page_header(
+    'Acompanhantes | ' . __($system['system_title']),
+    'Descubra perfis públicos por cidade',
+    $system['system_url'] . '/content/themes/' . $system['theme'] . '/images/og-thesex.png'
+  );
 
   $where_city = '';
   if ($city !== '') {
@@ -25,15 +28,16 @@ try {
   $get_companions = $db->query("SELECT
       users.user_id, users.user_name, users.user_firstname, users.user_lastname,
       users.user_gender, users.user_picture, users.user_verified,
-      users.user_current_city, plans.min_price, plans.period
+      users.user_current_city, plans.min_price
     FROM users
     INNER JOIN (
-      SELECT node_id, MIN(price) AS min_price, MIN(period) AS period
+      SELECT node_id, MIN(price) AS min_price
       FROM monetization_plans
       WHERE node_type = 'profile'
       GROUP BY node_id
     ) AS plans ON plans.node_id = users.user_id
     WHERE users.user_banned = '0'
+      AND users.user_activated = '1'
       AND users.user_monetization_enabled = '1'
       AND users.user_privacy_location = 'public'" . $where_city . "
     ORDER BY users.user_verified DESC, users.user_id DESC
