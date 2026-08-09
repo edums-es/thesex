@@ -8,6 +8,13 @@
 
     <form class="js_ajax-forms" data-url="admin/monetization.php?do=settings">
       <div class="card-body">
+        <div class="alert alert-info">
+          <div class="icon"><i class="fa fa-list-check fa-2x"></i></div>
+          <div class="text">
+            <strong>{__("Monetization activation checklist")}</strong><br>
+            {__("Enable monetization here, allow monetization in the user permission group, configure wallet or a payment gateway, then ask each creator to activate monetization and create at least one plan.")}
+          </div>
+        </div>
         <div class="form-table-row">
           <div class="avatar">
             {include file='__svg_icons.tpl' icon="monetization" class="main-icon" width="40px" height="40px"}

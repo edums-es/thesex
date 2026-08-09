@@ -160,7 +160,7 @@ try {
     throw new ValidationException(__("You don't have the permission to enable tips"));
   }
   /* check paid posts permission */
-  if (!$user->_data['can_monetize_content'] && !$user->_data['user_monetization_enabled'] && $_POST['is_paid'] == "true") {
+  if ((!$user->_data['can_monetize_content'] || !$user->_data['user_monetization_enabled']) && $_POST['is_paid'] == "true") {
     throw new ValidationException(__("You don't have the permission to add paid posts"));
   }
   /* valid inputs */
@@ -243,6 +243,9 @@ try {
   }
   /* check is_paid */
   $inputs['is_paid'] = ($_POST['handle'] != 'user' && $_POST['is_paid'] == "true") ? '1' : '0';
+  if ($inputs['is_paid'] && $inputs['for_subscriptions']) {
+    throw new ValidationException(__("You can't enable both subscriptions & paid post at the same time"));
+  }
   if ($inputs['is_paid']) {
     $inputs['is_paid_locked'] = ($_POST['is_paid_locked'] == "true") ? '1' : '0';
     if ($inputs['is_paid_locked'] && empty($_POST['file'])) {

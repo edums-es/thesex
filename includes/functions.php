@@ -561,6 +561,11 @@ function init_system()
       $system['theme'] = "default";
     }
   }
+  /* fall back safely when a theme was removed while still selected in DB/cookie */
+  if (!is_dir(ABSPATH . 'content/themes/' . $system['theme'])) {
+    $system['theme'] = 'default';
+    unset_cookie('s_theme');
+  }
 
   /* set system theme (day|night) mode */
   $system['theme_mode_night'] = $system['system_theme_night_on'];
@@ -8422,9 +8427,23 @@ function cleanup_user_typing_list($socket)
  */
 function __($text)
 {
-  global $gettextTranslator;
+  global $gettextTranslator, $system;
   if (!$text) {
     return '';
+  }
+  /* pt-BR quality overrides
+   * The bundled catalog contains a large number of fuzzy or unrelated
+   * translations. Keep the upstream catalog intact and override reviewed
+   * product language here so future Sngine upgrades remain mergeable.
+   */
+  if (($system['current_language'] ?? null) === 'pt_br') {
+    static $pt_br_overrides = null;
+    if ($pt_br_overrides === null) {
+      $pt_br_overrides = require ABSPATH . 'includes/pt_br_overrides.php';
+    }
+    if (array_key_exists($text, $pt_br_overrides)) {
+      return $pt_br_overrides[$text];
+    }
   }
   if (!$gettextTranslator) {
     return $text;

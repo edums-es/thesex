@@ -55,6 +55,7 @@
       <link rel="stylesheet" href="{$system['system_url']}/node_modules/bootstrap/dist/css/bootstrap.rtl.min.css">
       <link href="{$system['system_url']}/content/themes/{$system['theme']}/css/style.rtl.min.css?v={$system['system_version']}" rel="stylesheet">
     {/if}
+    <link href="{$system['system_url']}/content/themes/{$system['theme']}/css/monetization.css?v={$system['system_version']}" rel="stylesheet">
     <!-- CSS -->
 
     <!-- CSS Customized -->

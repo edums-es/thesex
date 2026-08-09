@@ -148,7 +148,7 @@ trait BlogsTrait
       throw new ValidationException(__("You can't enable both subscribers only & paid post"));
     }
     /* check paid posts permission */
-    if (!$this->_data['can_monetize_content'] && !$this->_data['user_monetization_enabled'] && $is_paid) {
+    if ((!$this->_data['can_monetize_content'] || !$this->_data['user_monetization_enabled']) && $is_paid) {
       throw new ValidationException(__("You don't have the permission to do this"));
     }
     /* check is_collaborative */
@@ -528,7 +528,7 @@ trait BlogsTrait
       throw new ValidationException(__("You can't enable both subscribers only & paid post"));
     }
     /* check paid posts permission */
-    if (!$this->_data['can_monetize_content'] && !$this->_data['user_monetization_enabled'] && $is_paid) {
+    if ((!$this->_data['can_monetize_content'] || !$this->_data['user_monetization_enabled']) && $is_paid) {
       throw new ValidationException(__("You don't have the permission to do this"));
     }
     /* validate title */

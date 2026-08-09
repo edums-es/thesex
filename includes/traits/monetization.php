@@ -87,7 +87,7 @@ trait MonetizationTrait
    */
   public function get_monetization_plan($plan_id, $override_authorization = false)
   {
-    global $db;
+    global $db, $system;
     /* get plan */
     $get_monetization_plan = $db->query(sprintf("SELECT * FROM monetization_plans WHERE plan_id = %s", secure($plan_id, 'int')));
     if ($get_monetization_plan->num_rows == 0) {
@@ -108,7 +108,9 @@ trait MonetizationTrait
           throw new Exception(__("This user is not available"));
         }
         /* get user monetization discount */
-        $monetization_plan['discounted_price'] = $monetization_plan['price'] * (1 - $user['user_monetization_discount_percent'] / 100);
+        if ($user['user_monetization_discount_enabled'] && $user['user_monetization_discount_percent'] > 0) {
+          $monetization_plan['discounted_price'] = $monetization_plan['price'] * (1 - $user['user_monetization_discount_percent'] / 100);
+        }
         /* get monetization node url */
         $monetization_plan['node_url'] = $system['system_url'] . "/" . $user['user_name'];
         break;
@@ -126,7 +128,9 @@ trait MonetizationTrait
           throw new Exception(__("This page is not available"));
         }
         /* get page monetization discount */
-        $monetization_plan['discounted_price'] = $monetization_plan['price'] * (1 - $page['page_monetization_discount_percent'] / 100);
+        if ($page['page_monetization_discount_enabled'] && $page['page_monetization_discount_percent'] > 0) {
+          $monetization_plan['discounted_price'] = $monetization_plan['price'] * (1 - $page['page_monetization_discount_percent'] / 100);
+        }
         /* get monetization node url */
         $monetization_plan['node_url'] = $system['system_url'] . "/pages/" . $page['page_name'];
         break;
@@ -144,7 +148,9 @@ trait MonetizationTrait
           throw new Exception(__("This group is not available"));
         }
         /* get group monetization discount */
-        $monetization_plan['discounted_price'] = $monetization_plan['price'] * (1 - $group['group_monetization_discount_percent'] / 100);
+        if ($group['group_monetization_discount_enabled'] && $group['group_monetization_discount_percent'] > 0) {
+          $monetization_plan['discounted_price'] = $monetization_plan['price'] * (1 - $group['group_monetization_discount_percent'] / 100);
+        }
         /* get monetization node url */
         $monetization_plan['node_url'] = $system['system_url'] . "/groups/" . $group['group_name'];
         break;
@@ -487,6 +493,7 @@ trait MonetizationTrait
           _error(400);
         }
         $content_creator_id = $node['user_id'];
+        $node_monetization_enabled = $node['user_monetization_enabled'];
         $notification_action = 'subscribe_profile';
         $notification_title = $node['user_name'];
         $notification_url = $node['user_name'];
@@ -499,6 +506,7 @@ trait MonetizationTrait
           _error(400);
         }
         $content_creator_id = $node['page_admin'];
+        $node_monetization_enabled = $node['page_monetization_enabled'];
         $notification_action = 'subscribe_page';
         $notification_title = $node['page_title'];
         $notification_url = $node['page_name'];
@@ -511,6 +519,7 @@ trait MonetizationTrait
           _error(400);
         }
         $content_creator_id = $node['group_admin'];
+        $node_monetization_enabled = $node['group_monetization_enabled'];
         $notification_action = 'subscribe_group';
         $notification_title = $node['group_title'];
         $notification_url = $node['group_name'];
@@ -520,6 +529,13 @@ trait MonetizationTrait
       default:
         _error(400);
         break;
+    }
+    /* validate creator eligibility at the moment of purchase */
+    if (!$node_monetization_enabled || !$this->check_user_permission($content_creator_id, 'monetization_permission')) {
+      throw new Exception(__("This monetization plan is not available"));
+    }
+    if ($user_id == $content_creator_id) {
+      throw new Exception(__("You can not subscribe to your own content"));
     }
     /* check if the viewer is subscribed to this node */
     if ($this->is_subscribed($monetization_plan['node_id'], $monetization_plan['node_type'], $user_id)) {
@@ -533,7 +549,8 @@ trait MonetizationTrait
     /* add as subscriber */
     $db->query(sprintf("INSERT INTO subscribers (user_id, node_id, node_type, plan_id, time) VALUES (%s, %s, %s, %s, %s)", secure($user_id, 'int'),  secure($monetization_plan['node_id'], 'int'), secure($monetization_plan['node_type']), secure($plan_id), secure($date)));
     /* prepare commission */
-    $content_price = $monetization_plan['price'];
+    $subscription_price = (isset($monetization_plan['discounted_price']) && $monetization_plan['discounted_price'] > 0) ? $monetization_plan['discounted_price'] : $monetization_plan['price'];
+    $content_price = $subscription_price;
     $commission = ($system['monetization_commission']) ? $content_price * ($system['monetization_commission'] / 100) : 0;
     $content_price = $content_price - $commission;
     /* update content creator monetization balance */
@@ -541,7 +558,7 @@ trait MonetizationTrait
     /* log commission */
     $this->log_commission($content_creator_id, $commission, 'subscribe');
     /* log subscriptions */
-    $this->log_subscriptions($user_id, $monetization_plan['title'], $monetization_plan['node_id'], $monetization_plan['node_type'], $monetization_plan['price'], $commission);
+    $this->log_subscriptions($user_id, $monetization_plan['title'], $monetization_plan['node_id'], $monetization_plan['node_type'], $subscription_price, $commission);
     /* notify the content creator */
     $this->post_notification(['to_user_id' => $content_creator_id, 'from_user_id' => $user_id, 'action' => $notification_action, 'node_type' => $notification_title, 'node_url' => $notification_url]);
     /* affiliates system */
@@ -712,12 +729,26 @@ trait MonetizationTrait
   public function unlock_paid_post($post_id, $user_id = null)
   {
     global $system, $db, $date;
+    /* check monetization enabled */
+    if (!$system['monetization_enabled']) {
+      throw new Exception(__("The monetization system has been disabled by the admin"));
+    }
     /* check user */
     $user_id = ($user_id) ? $user_id : $this->_data['user_id'];
     /* get post */
     $post = $this->get_post($post_id, false, true, true);
     if (!$post) {
       throw new Exception(__("This post is not available"));
+    }
+    if (!$post['is_paid'] || !$post['can_monetize_content'] || $post['post_price'] <= 0) {
+      throw new Exception(__("This post doesn't need payment"));
+    }
+    if ($post['author_id'] == $user_id) {
+      throw new Exception(__("You can not buy your own content"));
+    }
+    /* payment callbacks may be delivered more than once */
+    if ($this->is_user_paid_for_post($post_id, $user_id)) {
+      return "/posts/" . $post['post_id'];
     }
     /* unlock the post */
     $db->query(sprintf("INSERT INTO posts_paid (post_id, user_id, time) VALUES (%s, %s, %s)", secure($post_id, 'int'), secure($user_id, 'int'), secure($date)));

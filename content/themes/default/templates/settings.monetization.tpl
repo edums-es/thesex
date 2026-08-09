@@ -15,6 +15,16 @@
 <div class="card-body">
   {if $sub_view == ""}
 
+    <div class="creator-readiness">
+      <div class="creator-readiness__title">{__("Creator setup")}</div>
+      <div class="creator-readiness__text">{__("Complete these steps before publishing subscriber-only or paid content.")}</div>
+      <div class="creator-readiness__steps">
+        <div class="creator-readiness__step is-complete"><i class="fa fa-check-circle"></i><span>{__("Monetization permission granted")}</span></div>
+        <div class="creator-readiness__step {if !$system['verification_for_monetization'] || $user->_data['user_verified']}is-complete{else}is-pending{/if}"><i class="fa {if !$system['verification_for_monetization'] || $user->_data['user_verified']}fa-check-circle{else}fa-clock{/if}"></i><span>{__("Creator identity verified")}</span></div>
+        <div class="creator-readiness__step {if $user->_data['user_monetization_enabled'] && count($monetization_plans) > 0}is-complete{else}is-pending{/if}"><i class="fa {if $user->_data['user_monetization_enabled'] && count($monetization_plans) > 0}fa-check-circle{else}fa-clock{/if}"></i><span>{__("Monetization active with a plan")}</span></div>
+      </div>
+    </div>
+
     <div class="alert alert-info">
       <div class="text">
         <strong>{__("Monetization")}</strong><br>

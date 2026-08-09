@@ -1,20 +1,17 @@
 <!-- need subscription -->
-<div class="ptb20 plr20" {if $subscriptions_image} style="background-image: url('{$system['system_uploads']}/{$subscriptions_image}'); background-size: cover; background-position: center; min-height: 500px; position: relative;" {/if}>
-  <div class="text-center text-muted" {if $subscriptions_image} style="background: rgba(0, 0, 0, 0.5); padding: 20px; border-radius: 10px; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%;" {/if}>
-    {include file='__svg_icons.tpl' icon="locked" class="main-icon mb20" width="56px" height="56px"}
-    <div class="text-md">
-      <span style="padding: 8px 20px; background: #ececec; border-radius: 18px; font-weight: bold; font-size: 13px;">
-        {if isset($price)}
-          {__("SUBSCRIBE TO SEE THIS")} {__($node_type|capitalize)|upper} {__("CONTENT")}
-        {else}
-          {__("SUBSCRIPTIONS CONTENT")}
-        {/if}
-      </span>
+<div class="creator-lock creator-lock--subscription {if $subscriptions_image}has-cover{/if}" {if $subscriptions_image}style="background-image: url('{$system['system_uploads']}/{$subscriptions_image}');"{/if}>
+  <div class="creator-lock__shade"></div>
+  <div class="creator-lock__content">
+    <div class="creator-lock__icon">
+      {include file='__svg_icons.tpl' icon="locked" class="main-icon" width="34px" height="34px"}
     </div>
+    <div class="creator-lock__eyebrow">{__("Subscriber-only content")}</div>
+    <h3>{__("Exclusive content")}</h3>
+    <p>{__("Subscribe to unlock this creator's private content.")}</p>
     {if isset($price)}
       <div class="d-grid">
-        <button class="btn btn-info rounded rounded-pill mt20" data-toggle="modal" data-url="monetization/controller.php?do=get_plans&node_id={$node_id}&node_type={$node_type}" data-size="large">
-          <i class="fa fa-money-check-alt mr5"></i>{__("SUBSCRIBE FOR")} {if $discount_enabled}{print_money($price * (1 - $discount_percent / 100))}{/if}{if $discount_enabled}<span style="text-decoration: line-through;" class="ml5">{/if}{print_money($price)}{if $discount_enabled}</span>{/if}
+        <button class="btn creator-lock__cta rounded-pill" data-toggle="modal" data-url="monetization/controller.php?do=get_plans&node_id={$node_id}&node_type={$node_type}" data-size="large">
+          <i class="fa fa-crown mr5"></i>{__("Choose a plan")} - {if $discount_enabled}{print_money($price * (1 - $discount_percent / 100))}<span class="creator-lock__old-price">{print_money($price)}</span>{else}{print_money($price)}{/if}
         </button>
       </div>
     {/if}
