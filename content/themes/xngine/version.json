@@ -1,5 +1,5 @@
 {
-  "version": "1.6.2-thesex.1",
+  "version": "1.6.2-thesex.2",
   "sngine": "4.4.2",
-  "changelog": "Sanitized Xngine build with Sngine 4.4.2 compatibility and creator directories"
+  "changelog": "Sanitized Xngine build with Sngine 4.4.2 compatibility and protected-content publishing safeguards"
 }

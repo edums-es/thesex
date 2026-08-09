@@ -238,6 +238,13 @@ try {
   $inputs['for_subscriptions'] = ($_POST['handle'] != 'user' && $_POST['for_subscriptions'] == "true") ? '1' : '0';
   if ($inputs['for_subscriptions']) {
     if ($_POST['subscriptions_image']) {
+      if (!is_valid_upload_source($_POST['subscriptions_image'])) {
+        _error(400);
+      }
+      $has_exclusive_attachment = count($photos) > 0 || isset($_POST['reel']) || isset($_POST['video']) || isset($_POST['audio']) || isset($_POST['file']);
+      if (!$has_exclusive_attachment) {
+        throw new ValidationException(__("Attach the exclusive photo or video using the main publisher buttons before adding a blurred preview"));
+      }
       $inputs['subscriptions_image'] = $_POST['subscriptions_image'];
     }
   }

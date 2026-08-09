@@ -572,8 +572,12 @@
 														</label>
 													</div>
 												</div>
-												<div class="form-group x-hidden" id="subscriptions-image-wrapper">
-													<div class="x-image mt-1">
+											<div class="form-group x-hidden" id="subscriptions-image-wrapper">
+												<div class="alert alert-warning mb-2" role="alert">
+													<div class="fw-bold">{__("This is only the public blurred preview")}</div>
+													<div class="small">{__("First attach the exclusive photo or video using the main publisher buttons. Then add a separate preview image below.")}</div>
+												</div>
+												<div class="x-image mt-1">
 														<button type="button" class="close publisher-scraper-remover border-0 position-absolute rounded-circle text-white p-2 m-2 x-hidden js_x-image-remover" title='{__("Remove")}'>
 															<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
 														</button>
@@ -585,9 +589,9 @@
 														<i class="fa fa-camera fa-lg js_x-uploader" data-handle="x-image" data-blur="true"></i>
 														<input type="hidden" class="js_x-uploader-input" name="subscriptions_image" value="">
 													</div>
-													<div class="form-text">
-														{__("Upload a preview image for your post (This image will be blured)")}
-													</div>
+												<div class="form-text">
+													{__("Upload a separate public preview image (it will be permanently blurred)")}
+												</div>
 												</div>
 											{/if}
 											<!-- only for subscribers -->
