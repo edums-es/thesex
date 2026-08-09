@@ -1345,7 +1345,10 @@ $(function () {
         if (response.approval) {
           modal('#modal-success', { title: __['Under Review'], message: __['Your post is under review now, We will let you know when it is ready!'] });
         } else if (response.processing) {
-          modal('#modal-success', { title: __['Processing'], message: __['Your video is being processed, We will let you know when it is ready!'] });
+          var processing_message = response.protected
+            ? __['Your exclusive video is being processed and its protected preview is being prepared. We will let you know when it is ready!']
+            : __['Your video is being processed, We will let you know when it is ready!'];
+          modal('#modal-success', { title: __['Processing'], message: processing_message });
         } else {
           /* attache the new post */
           $('.js_posts_stream').find('ul:first').prepend(response.post);

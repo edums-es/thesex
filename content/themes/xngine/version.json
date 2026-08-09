@@ -1,5 +1,5 @@
 {
-  "version": "1.6.2-thesex.3",
+  "version": "1.6.2-thesex.4",
   "sngine": "4.4.2",
-  "changelog": "Automatic secure previews and ownership validation for subscriber-only photo posts"
+  "changelog": "Protected video previews, creator status and editable exclusive post covers"
 }

@@ -69,6 +69,34 @@ try {
       $return['post'] = $smarty->fetch("__feeds_post.text.tpl");
       break;
 
+    case 'subscription_preview':
+      // valid inputs
+      if (!isset($_POST['id']) || !is_numeric($_POST['id']) || empty($_POST['subscriptions_image'])) {
+        _error(400);
+      }
+      if (!is_valid_upload_source($_POST['subscriptions_image']) || !is_user_pending_upload($_POST['subscriptions_image'])) {
+        _error(400);
+      }
+      // get post and verify ownership
+      $post = $user->get_post($_POST['id']);
+      if (!$post || !$post['manage_post'] || !$post['for_subscriptions']) {
+        _error(403);
+      }
+      // always derive a permanently blurred copy on the server
+      $new_preview = create_subscription_preview_from_upload($_POST['subscriptions_image']);
+      if (!$new_preview) {
+        throw new ValidationException(__("We could not create the protected preview. Use a JPG or PNG image"));
+      }
+      $old_preview = $post['subscriptions_image'];
+      $db->query(sprintf("UPDATE posts SET subscriptions_image = %s WHERE post_id = %s", secure($new_preview), secure($_POST['id'], 'int')));
+      remove_pending_uploads([$new_preview]);
+      delete_uploads_file($_POST['subscriptions_image'], false);
+      if ($old_preview && $old_preview != $new_preview) {
+        delete_subscription_preview_if_unused($old_preview, $user->_data['user_id']);
+      }
+      $return['callback'] = 'window.location.reload();';
+      break;
+
     case 'product':
       // valid inputs
       /* if id is set & not numeric */

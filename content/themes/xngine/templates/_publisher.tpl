@@ -575,7 +575,7 @@
 											<div class="form-group x-hidden" id="subscriptions-image-wrapper">
 												<div class="alert alert-info mb-2" role="alert">
 													<div class="fw-bold">{__("Your exclusive media stays protected")}</div>
-													<div class="small">{__("Attach the original photo using the main publisher button. A safe blurred preview will be generated automatically.")}</div>
+													<div class="small">{__("Attach the original photo or video using the main publisher buttons. A safe blurred preview will be generated automatically.")}</div>
 												</div>
 												<div class="x-image mt-1">
 														<button type="button" class="close publisher-scraper-remover border-0 position-absolute rounded-circle text-white p-2 m-2 x-hidden js_x-image-remover" title='{__("Remove")}'>

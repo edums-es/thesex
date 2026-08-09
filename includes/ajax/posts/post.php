@@ -120,10 +120,10 @@ try {
     }
   }
   /* filter reel/video thumbnails */
-  if (!empty($_POST['reel_thumbnail']) && !is_valid_upload_source($_POST['reel_thumbnail'])) {
+  if (!empty($_POST['reel_thumbnail']) && (!is_valid_upload_source($_POST['reel_thumbnail']) || !is_user_pending_upload($_POST['reel_thumbnail']))) {
     _error(400);
   }
-  if (!empty($_POST['video_thumbnail']) && !is_valid_upload_source($_POST['video_thumbnail'])) {
+  if (!empty($_POST['video_thumbnail']) && (!is_valid_upload_source($_POST['video_thumbnail']) || !is_user_pending_upload($_POST['video_thumbnail']))) {
     _error(400);
   }
 
@@ -242,6 +242,7 @@ try {
   /* check for_subscriptions */
   $inputs['for_subscriptions'] = ($_POST['handle'] != 'user' && $_POST['for_subscriptions'] == "true") ? '1' : '0';
   $automatic_subscription_previews = array_values(array_filter(array_column($photos, 'subscription_preview')));
+  $subscription_sources_to_delete = [];
   if ($inputs['for_subscriptions']) {
     if (!empty($_POST['subscriptions_image'])) {
       if (!is_valid_upload_source($_POST['subscriptions_image']) || !is_user_pending_upload($_POST['subscriptions_image'])) {
@@ -251,9 +252,23 @@ try {
       if (!$has_exclusive_attachment) {
         throw new ValidationException(__("Attach the exclusive photo or video using the main publisher buttons before adding a blurred preview"));
       }
-      $inputs['subscriptions_image'] = $_POST['subscriptions_image'];
+      $inputs['subscriptions_image'] = create_subscription_preview_from_upload($_POST['subscriptions_image']);
+      if (!$inputs['subscriptions_image']) {
+        throw new ValidationException(__("We could not create the protected preview. Use a JPG or PNG image"));
+      }
+      $subscription_sources_to_delete[] = $_POST['subscriptions_image'];
     } elseif (count($automatic_subscription_previews) > 0) {
       $inputs['subscriptions_image'] = $automatic_subscription_previews[0];
+    } elseif (isset($_POST['video']) || isset($_POST['reel'])) {
+      $video_thumbnail = !empty($_POST['video_thumbnail']) ? $_POST['video_thumbnail'] : ($_POST['reel_thumbnail'] ?? '');
+      if ($video_thumbnail) {
+        $inputs['subscriptions_image'] = create_subscription_preview_from_upload($video_thumbnail);
+        if (!$inputs['subscriptions_image']) {
+          throw new ValidationException(__("We could not create the protected preview. Use a JPG or PNG custom preview"));
+        }
+      } elseif (!$system['ffmpeg_enabled']) {
+        throw new ValidationException(__("Add a custom preview for this exclusive video before publishing"));
+      }
     }
   }
   /* delete generated previews that are not used by this post */
@@ -331,6 +346,9 @@ try {
   $inputs['post_as_page'] = $_POST['post_as_page'];
   /* publish */
   $post = $user->publisher($inputs);
+  foreach ($subscription_sources_to_delete as $subscription_source) {
+    delete_uploads_file($subscription_source, false);
+  }
   /* assign variables */
   $smarty->assign('post', $post);
   $smarty->assign('_get', $_get);
@@ -344,7 +362,7 @@ try {
     if ($system['ffmpeg_enabled'] && ($post['reel']['source'] || $post['video']['source'])) {
       // [BACKGROUND PROCESS]
       /* return async */
-      return_json_async(['approval' => true]);
+      return_json_async(['approval' => true, 'protected' => (bool) $post['for_subscriptions']]);
       /* start ffmpeg converting */
       if ($post['reel']['source']) {
         ffmpeg_convert($post['post_id'], $post['author_id'], $post['reel']['source'], $post['reel']['thumbnail'], 'reel');
@@ -361,7 +379,7 @@ try {
     if ($system['ffmpeg_enabled'] && ($post['reel']['source'] || $post['video']['source'])) {
       // [BACKGROUND PROCESS]
       /* return async */
-      return_json_async(['processing' => true]);
+      return_json_async(['processing' => true, 'protected' => (bool) $post['for_subscriptions']]);
       /* start ffmpeg converting */
       if ($post['reel']['source']) {
         ffmpeg_convert($post['post_id'], $post['author_id'], $post['reel']['source'], $post['reel']['thumbnail'], 'reel');

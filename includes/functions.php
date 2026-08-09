@@ -3283,10 +3283,11 @@ function delete_avatar_cover_image($handle, $id = null)
  * @param int $file_size
  * @return void
  */
-function add_user_uploads($file_name, $file_size)
+function add_user_uploads($file_name, $file_size, $user_id = null)
 {
   global $db, $user, $date;
-  $db->query(sprintf("INSERT INTO users_uploads (user_id, file_name, file_size, insert_date) VALUES (%s, %s, %s, %s)", secure($user->_data['user_id'], 'int'), secure($file_name), secure($file_size), secure($date)));
+  $user_id = ($user_id) ? $user_id : $user->_data['user_id'];
+  $db->query(sprintf("INSERT INTO users_uploads (user_id, file_name, file_size, insert_date) VALUES (%s, %s, %s, %s)", secure($user_id, 'int'), secure($file_name), secure($file_size), secure($date)));
 }
 
 
@@ -3298,10 +3299,11 @@ function add_user_uploads($file_name, $file_size)
  * @param string $handle
  * @return void
  */
-function add_pending_uploads($file_name, $file_size, $handle)
+function add_pending_uploads($file_name, $file_size, $handle, $user_id = null)
 {
   global $db, $user, $date;
-  $db->query(sprintf("INSERT INTO users_uploads_pending (user_id, file_name, file_size, handle, insert_date) VALUES (%s, %s, %s, %s, %s)", secure($user->_data['user_id'], 'int'), secure($file_name), secure($file_size), secure($handle), secure($date)));
+  $user_id = ($user_id) ? $user_id : $user->_data['user_id'];
+  $db->query(sprintf("INSERT INTO users_uploads_pending (user_id, file_name, file_size, handle, insert_date) VALUES (%s, %s, %s, %s, %s)", secure($user_id, 'int'), secure($file_name), secure($file_size), secure($handle), secure($date)));
 }
 
 
@@ -4405,15 +4407,20 @@ function ffmpeg_convert($post_id, $post_author_id, $video_name, $thumbnail = '',
     $thumbnail_prefix = $system['uploads_prefix'] . '_' . get_hash_token();
     $thumbnail_name = $photos_directory . $thumbnail_prefix . '.jpeg';
     $thumbnail_path = ABSPATH . $system['uploads_directory'] . '/' . $thumbnail_name;
+    $thumbnail = $thumbnail_name;
     $extraction_time = ($duration > 1) ? ($duration / 2) : 1;
     if (!file_exists($thumbnail_path)) {
       shell_exec($system['ffmpeg_path'] . " -ss \"$extraction_time\" -i $original_video_local_path -vframes 1 -f mjpeg $thumbnail_path 2<&1");
+      /* create the protected derivative before cloud storage removes the local thumbnail */
+      ensure_video_subscription_preview($post_id, $thumbnail_name, $post_author_id);
       /* save the new video thumbnail to cloud */
       save_file_to_cloud($thumbnail_path, $thumbnail_name);
       /* update video thumbnail */
       $db->query(sprintf("UPDATE $posts_table SET thumbnail = %s WHERE post_id = %s", secure($thumbnail_name), secure($post_id, 'int')));
     }
   }
+  /* generate the public-safe cover for subscriber-only videos */
+  ensure_video_subscription_preview($post_id, $thumbnail, $post_author_id);
   /* get original hash */
   $original_hash = extarct_hash_token($video_name);
   /* set video prefix */
@@ -8247,7 +8254,7 @@ function blur_image($image_path, $image_type)
  * @param string $image_type
  * @return string|null
  */
-function create_subscription_preview($source_path, $source_name, $image_type)
+function create_subscription_preview($source_path, $source_name, $image_type, $user_id = null)
 {
   global $system;
   if (!is_valid_upload_source($source_name) || !is_file($source_path)) {
@@ -8273,14 +8280,117 @@ function create_subscription_preview($source_path, $source_name, $image_type)
       ->toFile($preview_path, $image_type, 75);
     $preview_size = filesize($preview_path);
     save_file_to_cloud($preview_path, $preview_name);
-    add_user_uploads($preview_name, $preview_size);
-    add_pending_uploads($preview_name, $preview_size, 'subscription-preview');
+    add_user_uploads($preview_name, $preview_size, $user_id);
+    add_pending_uploads($preview_name, $preview_size, 'subscription-preview', $user_id);
     return $preview_name;
   } catch (Throwable $e) {
     if (is_file($preview_path)) {
       unlink($preview_path);
     }
     return null;
+  }
+}
+
+
+/**
+ * create_subscription_preview_from_upload
+ *
+ * Creates a safe preview from an existing local or remote image upload.
+ *
+ * @param string $source_name
+ * @param int|null $user_id
+ * @return string|null
+ */
+function create_subscription_preview_from_upload($source_name, $user_id = null)
+{
+  global $system;
+  if (!is_valid_upload_source($source_name)) {
+    return null;
+  }
+  $source_path = ABSPATH . $system['uploads_directory'] . '/' . $source_name;
+  $temporary_path = null;
+  if (!is_file($source_path)) {
+    $temporary_path = tempnam(sys_get_temp_dir(), 'sg_subscription_');
+    if (!$temporary_path) {
+      return null;
+    }
+    $remote_file = @fopen($system['system_uploads'] . '/' . $source_name, 'rb');
+    $local_file = @fopen($temporary_path, 'wb');
+    if (!$remote_file || !$local_file) {
+      if (is_resource($remote_file)) fclose($remote_file);
+      if (is_resource($local_file)) fclose($local_file);
+      @unlink($temporary_path);
+      return null;
+    }
+    while (!feof($remote_file)) {
+      fwrite($local_file, fread($remote_file, 8192));
+    }
+    fclose($remote_file);
+    fclose($local_file);
+    $source_path = $temporary_path;
+  }
+  $image_type = mime_content_type($source_path);
+  $preview = create_subscription_preview($source_path, $source_name, $image_type, $user_id);
+  if ($temporary_path) {
+    @unlink($temporary_path);
+  }
+  return $preview;
+}
+
+
+/**
+ * ensure_video_subscription_preview
+ *
+ * Connects a blurred derivative of the video thumbnail to a subscriber post.
+ *
+ * @param int $post_id
+ * @param string $thumbnail
+ * @param int $post_author_id
+ * @return void
+ */
+function ensure_video_subscription_preview($post_id, $thumbnail, $post_author_id)
+{
+  global $db;
+  if (!$thumbnail || !is_valid_upload_source($thumbnail)) {
+    return;
+  }
+  $check = $db->query(sprintf("SELECT for_subscriptions, subscriptions_image FROM posts WHERE post_id = %s", secure($post_id, 'int')));
+  if ($check->num_rows == 0) {
+    return;
+  }
+  $post = $check->fetch_assoc();
+  if ($post['for_subscriptions'] != '1' || !empty($post['subscriptions_image'])) {
+    return;
+  }
+  $preview = create_subscription_preview_from_upload($thumbnail, $post_author_id);
+  if (!$preview) {
+    return;
+  }
+  $db->query(sprintf("UPDATE posts SET subscriptions_image = %s WHERE post_id = %s AND for_subscriptions = '1' AND (subscriptions_image IS NULL OR subscriptions_image = '')", secure($preview), secure($post_id, 'int')));
+  if ($db->affected_rows > 0) {
+    remove_pending_uploads([$preview], $post_author_id);
+  } else {
+    delete_uploads_file($preview, false, $post_author_id);
+  }
+}
+
+
+/**
+ * delete_subscription_preview_if_unused
+ *
+ * @param string $source_name
+ * @param int|null $user_id
+ * @return void
+ */
+function delete_subscription_preview_if_unused($source_name, $user_id = null)
+{
+  global $db;
+  if (!$source_name || !is_valid_upload_source($source_name)) {
+    return;
+  }
+  $check = $db->query(sprintf("SELECT COUNT(*) AS count FROM posts WHERE subscriptions_image = %s", secure($source_name)));
+  if ($check->fetch_assoc()['count'] == 0) {
+    delete_uploads_file($source_name, false, $user_id);
   }
 }
 

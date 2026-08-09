@@ -263,6 +263,7 @@
     __['Are you sure you want to subscribe to this free plan?'] = `{__('Are you sure you want to subscribe to this free plan?')}`;
     __['Processing'] = `{__('Processing')}`;
     __['Your video is being processed, We will let you know when it is ready!'] = `{__('Your video is being processed, We will let you know when it is ready!')}`;
+    __['Your exclusive video is being processed and its protected preview is being prepared. We will let you know when it is ready!'] = `{__('Your exclusive video is being processed and its protected preview is being prepared. We will let you know when it is ready!')}`;
     __['Under Review'] = `{__('Under Review')}`;
     __['Your post is under review now, We will let you know when it is ready!'] = `{__('Your post is under review now, We will let you know when it is ready!')}`;
     __['Payment Confirmation'] = `{__('Payment Confirmation')}`;
