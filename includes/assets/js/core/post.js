@@ -967,6 +967,7 @@ $(function () {
     var publisher = (!mini) ? $(this).parents('.publisher') : $(this).parents('.publisher-mini');
     var has_hidden_input = (publisher.find('.js_hidden-input-photos').length > 0) ? true : false;
     var files = publisher.data('photos');
+    var subscription_preview = (files[src] && files[src]['subscription_preview']) ? files[src]['subscription_preview'] : null;
     delete files[src];
     if (Object.keys(files).length > 0) {
       publisher.data('photos', files);
@@ -991,6 +992,9 @@ $(function () {
     item.remove();
     /* remove the attachment from server */
     $.post(api['data/delete'], { 'src': src });
+    if (subscription_preview) {
+      $.post(api['data/delete'], { 'src': subscription_preview });
+    }
   });
   /* publisher mini attachment video remover */
   $('body').on('click', '.js_publisher-mini-attachment-video-remover', function () {

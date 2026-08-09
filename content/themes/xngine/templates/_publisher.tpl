@@ -573,9 +573,9 @@
 													</div>
 												</div>
 											<div class="form-group x-hidden" id="subscriptions-image-wrapper">
-												<div class="alert alert-warning mb-2" role="alert">
-													<div class="fw-bold">{__("This is only the public blurred preview")}</div>
-													<div class="small">{__("First attach the exclusive photo or video using the main publisher buttons. Then add a separate preview image below.")}</div>
+												<div class="alert alert-info mb-2" role="alert">
+													<div class="fw-bold">{__("Your exclusive media stays protected")}</div>
+													<div class="small">{__("Attach the original photo using the main publisher button. A safe blurred preview will be generated automatically.")}</div>
 												</div>
 												<div class="x-image mt-1">
 														<button type="button" class="close publisher-scraper-remover border-0 position-absolute rounded-circle text-white p-2 m-2 x-hidden js_x-image-remover" title='{__("Remove")}'>
@@ -590,7 +590,7 @@
 														<input type="hidden" class="js_x-uploader-input" name="subscriptions_image" value="">
 													</div>
 												<div class="form-text">
-													{__("Upload a separate public preview image (it will be permanently blurred)")}
+													{__("Optional: upload a different image to use as the public blurred preview")}
 												</div>
 												</div>
 											{/if}

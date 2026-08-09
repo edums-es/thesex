@@ -42,8 +42,13 @@ try {
       _error(400);
     }
     foreach ($_POST['photos'] as $photo) {
-      if (!is_valid_upload_source($photo->source ?? null)) {
+      if (!is_valid_upload_source($photo->source ?? null) || !is_user_pending_upload($photo->source)) {
         _error(400);
+      }
+      if (!empty($photo->subscription_preview)) {
+        if (!is_valid_upload_source($photo->subscription_preview) || !is_user_pending_upload($photo->subscription_preview)) {
+          _error(400);
+        }
       }
       $photos[] = (array) $photo;
     }
@@ -236,9 +241,10 @@ try {
   $inputs['tips_enabled'] = ($_POST['handle'] != 'page' && $_POST['tips_enabled'] == "true") ? '1' : '0';
   /* check for_subscriptions */
   $inputs['for_subscriptions'] = ($_POST['handle'] != 'user' && $_POST['for_subscriptions'] == "true") ? '1' : '0';
+  $automatic_subscription_previews = array_values(array_filter(array_column($photos, 'subscription_preview')));
   if ($inputs['for_subscriptions']) {
-    if ($_POST['subscriptions_image']) {
-      if (!is_valid_upload_source($_POST['subscriptions_image'])) {
+    if (!empty($_POST['subscriptions_image'])) {
+      if (!is_valid_upload_source($_POST['subscriptions_image']) || !is_user_pending_upload($_POST['subscriptions_image'])) {
         _error(400);
       }
       $has_exclusive_attachment = count($photos) > 0 || isset($_POST['reel']) || isset($_POST['video']) || isset($_POST['audio']) || isset($_POST['file']);
@@ -246,6 +252,14 @@ try {
         throw new ValidationException(__("Attach the exclusive photo or video using the main publisher buttons before adding a blurred preview"));
       }
       $inputs['subscriptions_image'] = $_POST['subscriptions_image'];
+    } elseif (count($automatic_subscription_previews) > 0) {
+      $inputs['subscriptions_image'] = $automatic_subscription_previews[0];
+    }
+  }
+  /* delete generated previews that are not used by this post */
+  foreach ($automatic_subscription_previews as $automatic_preview) {
+    if (empty($inputs['subscriptions_image']) || $automatic_preview != $inputs['subscriptions_image']) {
+      delete_uploads_file($automatic_preview, false);
     }
   }
   /* check is_paid */

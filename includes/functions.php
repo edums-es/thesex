@@ -2420,6 +2420,12 @@ function upload_file($from_web = false)
           sanitize_image_trailing_bytes($final_file_path, $image->_img_type);
         }
 
+        // create a safe blurred preview for subscriber-only posts
+        $subscription_preview = null;
+        if ($_POST['handle'] == 'publisher') {
+          $subscription_preview = create_subscription_preview($final_file_path, $final_file_name, $image->_img_type);
+        }
+
         // upload to
         if ($system['s3_enabled']) {
           /* Amazon S3 */
@@ -2705,7 +2711,7 @@ function upload_file($from_web = false)
 
         // return the file name & exit
         if ($_POST["multiple"] == "true") {
-          $finished_files[] = ["source" => $final_file_name, "blur" => $image_blured];
+          $finished_files[] = ["source" => $final_file_name, "blur" => $image_blured, "subscription_preview" => $subscription_preview];
           if ($_POST["totalFiles"] == $_POST["fileIndex"] + 1) {
             return $finished_files;
           } else {
@@ -4016,6 +4022,35 @@ function is_valid_upload_source($source)
     '#^(files|photos|sounds|videos)/\d{4}/\d{2}/[A-Za-z0-9._-]+\.[A-Za-z0-9]+$#',
     $source
   );
+}
+
+
+/**
+ * is_user_pending_upload
+ *
+ * Confirms that an upload was completed and belongs to the current user.
+ *
+ * @param string $source
+ * @param int|null $user_id
+ * @return bool
+ */
+function is_user_pending_upload($source, $user_id = null)
+{
+  global $system, $db, $user;
+  if (!is_valid_upload_source($source)) {
+    return false;
+  }
+  $remote_storage_enabled = !empty($system['s3_enabled']) || !empty($system['google_cloud_enabled']) || !empty($system['digitalocean_enabled']) || !empty($system['wasabi_enabled']) || !empty($system['backblaze_enabled']) || !empty($system['yandex_cloud_enabled']) || !empty($system['cloudflare_r2_enabled']) || !empty($system['pushr_enabled']) || !empty($system['ftp_enabled']);
+  if (!$remote_storage_enabled) {
+    $uploads_base = realpath(ABSPATH . $system['uploads_directory']);
+    $upload_path = realpath(ABSPATH . $system['uploads_directory'] . '/' . $source);
+    if (!$uploads_base || !$upload_path || !str_starts_with($upload_path, $uploads_base . DIRECTORY_SEPARATOR) || !is_file($upload_path)) {
+      return false;
+    }
+  }
+  $user_id = ($user_id) ? $user_id : $user->_data['user_id'];
+  $check = $db->query(sprintf("SELECT COUNT(*) AS count FROM users_uploads_pending WHERE user_id = %s AND file_name = %s", secure($user_id, 'int'), secure($source)));
+  return $check->fetch_assoc()['count'] > 0;
 }
 
 
@@ -8197,6 +8232,55 @@ function blur_image($image_path, $image_type)
     $image->toFile($image_path, $image_type);
   } catch (Exception $e) {
     return $e->getMessage();
+  }
+}
+
+
+/**
+ * create_subscription_preview
+ *
+ * Creates a separate, reduced and permanently blurred preview without exposing
+ * the original subscriber-only image.
+ *
+ * @param string $source_path
+ * @param string $source_name
+ * @param string $image_type
+ * @return string|null
+ */
+function create_subscription_preview($source_path, $source_name, $image_type)
+{
+  global $system;
+  if (!is_valid_upload_source($source_name) || !is_file($source_path)) {
+    return null;
+  }
+  $supported_types = [
+    'image/jpeg' => 'jpg',
+    'image/jpg' => 'jpg',
+    'image/png' => 'png'
+  ];
+  if (!isset($supported_types[$image_type])) {
+    return null;
+  }
+  $directory = dirname($source_name);
+  $preview_name = (($directory == '.') ? '' : $directory . '/') . $system['uploads_prefix'] . '_' . get_hash_token() . '_subscription_preview.' . $supported_types[$image_type];
+  $preview_path = ABSPATH . $system['uploads_directory'] . '/' . $preview_name;
+  try {
+    $preview = new claviska\SimpleImage();
+    $preview->fromFile($source_path)
+      ->autoOrient()
+      ->bestFit(960, 1280)
+      ->blur('gaussian', 25)
+      ->toFile($preview_path, $image_type, 75);
+    $preview_size = filesize($preview_path);
+    save_file_to_cloud($preview_path, $preview_name);
+    add_user_uploads($preview_name, $preview_size);
+    add_pending_uploads($preview_name, $preview_size, 'subscription-preview');
+    return $preview_name;
+  } catch (Throwable $e) {
+    if (is_file($preview_path)) {
+      unlink($preview_path);
+    }
+    return null;
   }
 }
 

@@ -1,5 +1,5 @@
 {
-  "version": "1.6.2-thesex.2",
+  "version": "1.6.2-thesex.3",
   "sngine": "4.4.2",
-  "changelog": "Sanitized Xngine build with Sngine 4.4.2 compatibility and protected-content publishing safeguards"
+  "changelog": "Automatic secure previews and ownership validation for subscriber-only photo posts"
 }
