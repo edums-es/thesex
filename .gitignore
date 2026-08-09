@@ -13,3 +13,11 @@
 # Generated uploads and temporary media
 /content/uploads/temp/*
 !/content/uploads/temp/index.html
+/content/uploads/photos/**
+!/content/uploads/photos/index.html
+/content/uploads/videos/**
+!/content/uploads/videos/index.html
+/content/uploads/files/**
+!/content/uploads/files/index.html
+/content/uploads/sounds/**
+!/content/uploads/sounds/index.html
