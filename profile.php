@@ -109,12 +109,17 @@ try {
   }
   /* check if profile has monetization enabled && subscriptions plans */
   $profile['has_subscriptions_plans'] = $profile['can_monetize_content'] && $profile['user_monetization_enabled'] && $profile['user_monetization_plans'] > 0;
+  /* creator experience flags */
+  $profile['is_creator_profile'] = $profile['has_subscriptions_plans'];
+  $profile['i_subscribed'] = false;
+  $profile['subscribers_count'] = 0;
   /* check if the profile needs subscription (exclude: admins & mods & profile owner) */
   $profile['needs_subscription'] = false;
   if ($profile['has_subscriptions_plans']) {
     if ($user->_logged_in) {
       if ($user->_data['user_group'] == 3 && $profile['user_id'] != $user->_data['user_id']) {
-        if (!$user->is_subscribed($profile['user_id'])) {
+        $profile['i_subscribed'] = $user->is_subscribed($profile['user_id']);
+        if (!$profile['i_subscribed']) {
           $profile['needs_subscription'] = true;
         }
       }
@@ -187,6 +192,21 @@ try {
           }
         }
         $profile['profile_completion'] = round(100 - ($steps_missed * (100 / $steps_requried)));
+
+        /* creator readiness (kept separate from the generic profile score) */
+        if ($profile['can_monetize_content']) {
+          $creator_steps = [
+            !$profile['user_picture_default'],
+            !$profile['user_cover_default'],
+            !empty($profile['user_biography']),
+            !$system['verification_for_monetization'] || $profile['user_verified'],
+            (bool) $profile['user_monetization_enabled'],
+            (bool) $profile['has_subscriptions_plans'],
+          ];
+          $profile['creator_readiness_completed'] = count(array_filter($creator_steps));
+          $profile['creator_readiness_total'] = count($creator_steps);
+          $profile['creator_readiness'] = (int) round(($profile['creator_readiness_completed'] / $profile['creator_readiness_total']) * 100);
+        }
       }
 
       /* get the merits balance (if enabled) */

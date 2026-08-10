@@ -12,7 +12,7 @@ display: none !important
     <!-- content panel -->
     <div class="col-lg-12 w-100">
 		<!-- profile-header -->
-		<div class="profile-header position-relative bg-white">
+		<div class="profile-header position-relative bg-white {if $profile['is_creator_profile']}creator-profile-header{/if}">
 			<!-- profile-cover -->
 			<div class="profile-cover-wrapper x_adslist position-relative overflow-hidden rounded-0">
 				{if $profile['user_cover_id']}
@@ -171,6 +171,12 @@ display: none !important
 				<!-- profile-name -->
 				
 				<p class="mb-0 text-muted">@{$profile['user_name']}</p>
+				{if $profile['is_creator_profile']}
+					<div class="creator-profile-label mt-2">
+						<i class="fa fa-crown"></i>
+						<span>{if $profile['user_verified']}{__("Verified creator")}{else}{__("Content creator")}{/if}</span>
+					</div>
+				{/if}
 				
 				{if $system['biography_info_enabled']}
 					{if !is_empty($profile['user_biography'])}
@@ -423,9 +429,71 @@ display: none !important
 		</div>
 		<!-- profile-header -->
 
+		{if $profile['is_creator_profile']}
+			<!-- creator spotlight -->
+			<section class="creator-profile-spotlight">
+				<div class="creator-profile-spotlight__copy">
+					<div class="creator-profile-spotlight__eyebrow"><i class="fa fa-lock"></i> {__("Exclusive creator profile")}</div>
+					<h2>{__("Unlock the complete experience from")} {$profile['name']}</h2>
+					<p>{__("Subscribe for exclusive publications, protected photos and videos, and closer contact with the creator.")}</p>
+					<div class="creator-profile-benefits">
+						<span><i class="fa fa-images"></i> {__("Exclusive content")}</span>
+						{if $system['chat_enabled']}<span><i class="fa fa-comment-dots"></i> {__("Direct messages")}</span>{/if}
+						{if $profile['user_verified']}<span><i class="fa fa-circle-check"></i> {__("Verified profile")}</span>{/if}
+					</div>
+				</div>
+				<div class="creator-profile-spotlight__actions">
+					{if $user->_logged_in && $user->_data['user_id'] == $profile['user_id']}
+						<a class="btn creator-profile-primary" href="{$system['system_url']}/settings/monetization"><i class="fa fa-chart-line"></i> {__("Creator dashboard")}</a>
+						<a class="btn creator-profile-secondary" href="{$system['system_url']}/settings/profile"><i class="fa fa-pen"></i> {__("Edit profile")}</a>
+					{else}
+						<div class="creator-profile-price">
+							<small>{__("Subscriptions from")}</small>
+							<strong>{if $profile['user_monetization_discount_enabled']}{print_money($profile['user_monetization_min_price'] * (1 - $profile['user_monetization_discount_percent'] / 100))}{else}{print_money($profile['user_monetization_min_price'])}{/if}<span>/{__("month")}</span></strong>
+						</div>
+						{if $user->_logged_in}
+							<button class="btn creator-profile-primary" data-toggle="modal" data-url="monetization/controller.php?do=get_plans&node_id={$profile['user_id']}&node_type=profile" data-size="large"><i class="fa {if $profile['i_subscribed']}fa-circle-check{else}fa-crown{/if}"></i> {if $profile['i_subscribed']}{__("Subscription active")}{else}{__("Subscribe now")}{/if}</button>
+						{else}
+							<button class="btn creator-profile-primary" data-toggle="modal" data-url="#modal-login"><i class="fa fa-crown"></i> {__("Subscribe now")}</button>
+						{/if}
+						<div class="creator-profile-quick-actions">
+							{if $user->_logged_in && $system['chat_enabled'] && ($profile['user_privacy_chat'] == "public" || ($profile['user_privacy_chat'] == "friends" && $profile['we_friends']))}
+								<button type="button" class="btn creator-profile-secondary js_chat-start" data-uid="{$profile['user_id']}" data-name="{$profile['name']}" data-link="{$profile['user_name']}" data-picture="{$profile['user_picture']}"><i class="fa fa-comment-dots"></i> {__("Message")}{if $profile['chat_price']} · {print_money($profile['chat_price'])}{/if}</button>
+							{/if}
+							{if $user->_logged_in && $profile['can_receive_tips'] && $profile['user_tips_enabled']}
+								<button type="button" class="btn creator-profile-secondary" data-toggle="modal" data-url="#send-tip" data-options='{ "id": "{$profile['user_id']}"}'><i class="fa fa-gift"></i> {__("Send a Tip")}</button>
+							{/if}
+						</div>
+					{/if}
+				</div>
+			</section>
+			<!-- creator spotlight -->
+		{/if}
+
 		<!-- profile-tabs -->
-		<div class="position-sticky x_top_posts profile-tabs-wrapper">
+		<div class="position-sticky x_top_posts profile-tabs-wrapper {if $profile['is_creator_profile']}creator-profile-tabs{/if}">
 			<div class="d-flex align-items-center justify-content-center">
+				{if $profile['is_creator_profile']}
+					<div {if $view == ""}class="active fw-semibold" {/if}>
+						<a href="{$system['system_url']}/{$profile['user_name']}" class="body-color side_item_hover w-100 text-center d-block"><span class="position-relative d-inline-block py-3"><i class="fa fa-house me-1"></i> {__("Feed")}</span></a>
+					</div>
+					<div {if $view == "photos" || $view == "albums" || $view == "album"}class="active fw-semibold" {/if}>
+						<a href="{$system['system_url']}/{$profile['user_name']}/photos" class="body-color side_item_hover w-100 text-center d-block"><span class="position-relative d-inline-block py-3"><i class="fa fa-image me-1"></i> {__("Photos")}</span></a>
+					</div>
+					{if $system['videos_enabled']}
+						<div {if $view == "videos" || $view == "reels"}class="active fw-semibold" {/if}>
+							<a href="{$system['system_url']}/{$profile['user_name']}/videos" class="body-color side_item_hover w-100 text-center d-block"><span class="position-relative d-inline-block py-3"><i class="fa fa-play me-1"></i> {__("Videos")}</span></a>
+						</div>
+					{/if}
+					<div {if $view == "followers" || $view == "followings"}class="active fw-semibold" {/if}>
+						<a href="{$system['system_url']}/{$profile['user_name']}/followers" class="body-color side_item_hover w-100 text-center d-block"><span class="position-relative d-inline-block py-3"><i class="fa fa-users me-1"></i> {__("Community")}</span></a>
+					</div>
+					{if $user->_logged_in && $user->_data['user_id'] == $profile['user_id']}
+						<div {if $view == "subscribers"}class="active fw-semibold" {/if}>
+							<a href="{$system['system_url']}/{$profile['user_name']}/subscribers" class="body-color side_item_hover w-100 text-center d-block"><span class="position-relative d-inline-block py-3"><i class="fa fa-crown me-1"></i> {__("Subscribers")}</span></a>
+						</div>
+					{/if}
+				{else}
 				<div {if $view == ""}class="active fw-semibold" {/if}>
 					<a href="{$system['system_url']}/{$profile['user_name']}" class="body-color side_item_hover w-100 text-center d-block">
 						<span class="position-relative d-inline-block py-3">{__("Timeline")}</span>
@@ -489,6 +557,7 @@ display: none !important
 						</a>
 					</div>
 				{/if}
+				{/if}
 			</div>
 		</div>
 		<!-- profile-tabs -->
@@ -501,7 +570,7 @@ display: none !important
 				<!-- left panel -->
 				<div class="col-lg-4 px-lg-3 py-3 order-2 x_sidebar_order js_sticky-sidebar">
 					<!-- subscribe -->
-					{if $user->_logged_in && $user->_data['user_id'] != $profile['user_id'] && $profile['has_subscriptions_plans']}
+					{if $user->_logged_in && $user->_data['user_id'] != $profile['user_id'] && $profile['has_subscriptions_plans'] && !$profile['is_creator_profile']}
 						<button class="btn btn-primary mb-3 w-100" data-toggle="modal" data-url="monetization/controller.php?do=get_plans&node_id={$profile['user_id']}&node_type=profile" data-size="large">
 							{__("SUBSCRIBE FOR")} {if $profile['user_monetization_discount_enabled']}{print_money($profile['user_monetization_min_price'] * (1 - $profile['user_monetization_discount_percent'] / 100))}{/if}{if $profile['user_monetization_discount_enabled']}<span class="ms-1 text-decoration-line-through">{/if}{print_money($profile['user_monetization_min_price'])}{if $profile['user_monetization_discount_enabled']}</span>{/if}
 						</button>
@@ -509,7 +578,7 @@ display: none !important
 					<!-- subscribe -->
 
 					<!-- tips -->
-					{if $user->_logged_in && $user->_data['user_id'] != $profile['user_id'] && $profile['can_receive_tips'] && $profile['user_tips_enabled']}
+					{if $user->_logged_in && $user->_data['user_id'] != $profile['user_id'] && $profile['can_receive_tips'] && $profile['user_tips_enabled'] && !$profile['is_creator_profile']}
 						<button type="button" class="btn btn-primary mb-3 w-100" data-toggle="modal" data-url="#send-tip" data-options='{ "id": "{$profile['user_id']}"}'>
 						  {__("Send a Tip")}
 						</button>
@@ -1032,6 +1101,39 @@ display: none !important
 
 				<!-- right panel -->
 				<div class="col-lg-8 order-1 ">
+
+					{if $user->_logged_in && $user->_data['user_id'] == $profile['user_id'] && $profile['can_monetize_content']}
+						<!-- creator dashboard -->
+						<section class="creator-dashboard-card mt-3">
+							<div class="creator-dashboard-card__header">
+								<div>
+									<span class="creator-dashboard-card__eyebrow"><i class="fa fa-wand-magic-sparkles"></i> {__("Creator area")}</span>
+									<h3>{__("Your creator dashboard")}</h3>
+									<p>{__("Track your profile and finish the essential steps to start converting visitors into subscribers.")}</p>
+								</div>
+								<div class="creator-dashboard-score"><strong>{$profile['creator_readiness']}%</strong><span>{__("ready")}</span></div>
+							</div>
+							<div class="creator-dashboard-progress"><span style="width: {$profile['creator_readiness']}%"></span></div>
+							<div class="creator-dashboard-stats">
+								<div><span>{__("Subscribers")}</span><strong>{$profile['subscribers_count']}</strong></div>
+								<div><span>{__("Available balance")}</span><strong>{print_money($user->_data['user_monetization_balance'])}</strong></div>
+								<div><span>{__("Publications")}</span><strong>{$profile['posts_count']}</strong></div>
+							</div>
+							<div class="creator-dashboard-checklist">
+								<span class="{if !$profile['user_picture_default']}is-complete{/if}"><i class="fa {if !$profile['user_picture_default']}fa-circle-check{else}fa-circle{/if}"></i> {__("Profile photo")}</span>
+								<span class="{if !$profile['user_cover_default']}is-complete{/if}"><i class="fa {if !$profile['user_cover_default']}fa-circle-check{else}fa-circle{/if}"></i> {__("Cover photo")}</span>
+								<span class="{if $profile['user_biography']}is-complete{/if}"><i class="fa {if $profile['user_biography']}fa-circle-check{else}fa-circle{/if}"></i> {__("Creator biography")}</span>
+								<span class="{if !$system['verification_for_monetization'] || $profile['user_verified']}is-complete{/if}"><i class="fa {if !$system['verification_for_monetization'] || $profile['user_verified']}fa-circle-check{else}fa-circle{/if}"></i> {__("Identity verification")}</span>
+								<span class="{if $profile['user_monetization_enabled']}is-complete{/if}"><i class="fa {if $profile['user_monetization_enabled']}fa-circle-check{else}fa-circle{/if}"></i> {__("Monetization active")}</span>
+								<span class="{if $profile['has_subscriptions_plans']}is-complete{/if}"><i class="fa {if $profile['has_subscriptions_plans']}fa-circle-check{else}fa-circle{/if}"></i> {__("Subscription plan published")}</span>
+							</div>
+							<div class="creator-dashboard-actions">
+								<a class="btn creator-profile-primary" href="{$system['system_url']}/settings/monetization"><i class="fa fa-sliders"></i> {__("Manage monetization")}</a>
+								<a class="btn creator-profile-secondary" href="{$system['system_url']}/{$profile['user_name']}"><i class="fa fa-eye"></i> {__("View public profile")}</a>
+							</div>
+						</section>
+						<!-- creator dashboard -->
+					{/if}
 
 					<!-- publisher -->
 					{if $user->_logged_in}
