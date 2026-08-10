@@ -433,14 +433,34 @@ display: none !important
 			<!-- creator spotlight -->
 			<section class="creator-profile-spotlight">
 				<div class="creator-profile-spotlight__copy">
-					<div class="creator-profile-spotlight__eyebrow"><i class="fa fa-lock"></i> {__("Exclusive creator profile")}</div>
-					<h2>{__("Unlock the complete experience from")} {$profile['name']}</h2>
-					<p>{__("Subscribe for exclusive publications, protected photos and videos, and closer contact with the creator.")}</p>
-					<div class="creator-profile-benefits">
-						<span><i class="fa fa-images"></i> {__("Exclusive content")}</span>
-						{if $system['chat_enabled']}<span><i class="fa fa-comment-dots"></i> {__("Direct messages")}</span>{/if}
-						{if $profile['user_verified']}<span><i class="fa fa-circle-check"></i> {__("Verified profile")}</span>{/if}
-					</div>
+					{if $user->_logged_in && $user->_data['user_id'] == $profile['user_id']}
+						<div class="creator-profile-spotlight__eyebrow"><i class="fa fa-wand-magic-sparkles"></i> {__("Creator area")}</div>
+						<h2>{__("Your creator profile")}</h2>
+						<p>{__("Manage your exclusive content, subscription plans and profile presentation from one place.")}</p>
+						<div class="creator-profile-benefits">
+							<span><i class="fa fa-chart-line"></i> {__("Creator dashboard")}</span>
+							<span><i class="fa fa-users"></i> {__("Subscriber management")}</span>
+							<span><i class="fa fa-images"></i> {__("Exclusive content")}</span>
+						</div>
+					{elseif $user->_logged_in && $profile['i_subscribed']}
+						<div class="creator-profile-spotlight__eyebrow"><i class="fa fa-circle-check"></i> {__("Subscription active")}</div>
+						<h2>{__("Your access to")} {$profile['name']} {__("is active")}</h2>
+						<p>{__("Explore the creator's exclusive publications, protected photos and videos, and subscriber benefits.")}</p>
+						<div class="creator-profile-benefits">
+							<span><i class="fa fa-lock-open"></i> {__("Exclusive content unlocked")}</span>
+							{if $system['chat_enabled']}<span><i class="fa fa-comment-dots"></i> {__("Direct messages")}</span>{/if}
+							{if $profile['user_verified']}<span><i class="fa fa-circle-check"></i> {__("Verified profile")}</span>{/if}
+						</div>
+					{else}
+						<div class="creator-profile-spotlight__eyebrow"><i class="fa fa-lock"></i> {__("Exclusive creator profile")}</div>
+						<h2>{__("Unlock the complete experience from")} {$profile['name']}</h2>
+						<p>{__("Subscribe for exclusive publications, protected photos and videos, and closer contact with the creator.")}</p>
+						<div class="creator-profile-benefits">
+							<span><i class="fa fa-images"></i> {__("Exclusive content")}</span>
+							{if $system['chat_enabled']}<span><i class="fa fa-comment-dots"></i> {__("Direct messages")}</span>{/if}
+							{if $profile['user_verified']}<span><i class="fa fa-circle-check"></i> {__("Verified profile")}</span>{/if}
+						</div>
+					{/if}
 				</div>
 				<div class="creator-profile-spotlight__actions">
 					{if $user->_logged_in && $user->_data['user_id'] == $profile['user_id']}
