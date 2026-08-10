@@ -11,20 +11,23 @@
 				{if $system['discover_posts_enabled']}
 					<div {if $page == "index" && $view == "discover"}class="active fw-semibold" {/if}>
 						<a href="{$system['system_url']}/discover" class="body-color side_item_hover w-100 text-center d-block">
-							<span class="position-relative d-inline-block py-3">{__("Discover Posts")}</span>
+							<span class="position-relative d-inline-block py-3 x_feed_tab_label x_feed_tab_label--desktop">{__("Discover Posts")}</span>
+							<span class="position-relative py-3 x_feed_tab_label x_feed_tab_label--mobile">{__("Discover")}</span>
 						</a>
 					</div>
 				{/if}
 				{if $system['popular_posts_enabled']}
 					<div {if $page == "index" && $view == "popular"}class="active fw-semibold" {/if}>
 						<a href="{$system['system_url']}/popular" class="body-color side_item_hover w-100 text-center d-block">
-							<span class="position-relative d-inline-block py-3">{__("Popular Posts")}</span>
+							<span class="position-relative d-inline-block py-3 x_feed_tab_label x_feed_tab_label--desktop">{__("Popular Posts")}</span>
+							<span class="position-relative py-3 x_feed_tab_label x_feed_tab_label--mobile">{__("Popular")}</span>
 						</a>
 					</div>
 				{/if}
 				<div {if $page == "index" && $view == ""}class="active fw-semibold" {/if}>
 					<a href="{$system['system_url']}" class="body-color side_item_hover w-100 text-center d-block">
-						<span class="position-relative d-inline-block py-3">{__("Recent Updates")}</span>
+						<span class="position-relative d-inline-block py-3 x_feed_tab_label x_feed_tab_label--desktop">{__("Recent Updates")}</span>
+						<span class="position-relative py-3 x_feed_tab_label x_feed_tab_label--mobile">{__("Recent")}</span>
 					</a>
 				</div>
             </div>

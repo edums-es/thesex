@@ -137,8 +137,8 @@
 											<span class="text">{__("Home")}</span>
 										</div>
 									</a>
-									<a href="{$system['system_url']}/acompanhantes" class="x_creator_companion_cta {if $page == "acompanhantes"}active{/if}">
-										<i class="fa-solid fa-location-dot"></i>
+									<a href="{$system['system_url']}/acompanhantes" class="x_creator_companion_cta {if $page == "acompanhantes"}active{/if}" aria-label='{__("Companions")}' title='{__("Companions")}'>
+										{include file='__svg_icons.tpl' icon="companions" class="x_companion_icon" width="25px" height="25px"}
 										<span class="text">{__("Companions")}</span>
 									</a>
 									<a href="{$system['system_url']}/creators" class="d-block py-1 body-color x_side_links {if $page == "creators"}fw-semibold main{/if}">

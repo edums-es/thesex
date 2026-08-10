@@ -512,6 +512,10 @@
 
     {include file='../images/svg/header-home.svg'}
 
+  {elseif $icon == "companions"}
+
+    {include file='../images/svg/companions.svg'}
+
   {elseif $icon == "header-plus"}
 
     {include file='../images/svg/header-plus.svg'}

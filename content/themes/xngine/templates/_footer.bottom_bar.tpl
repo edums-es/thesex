@@ -94,8 +94,8 @@
 
       <!-- companions -->
       <div class="link {if $page == 'acompanhantes'}active{/if}">
-        <a href="{$system['system_url']}/acompanhantes">
-          <i class="fa fa-location-dot fa-lg"></i>
+        <a href="{$system['system_url']}/acompanhantes" aria-label='{__("Companions")}' title='{__("Companions")}'>
+          {include file='__svg_icons.tpl' icon="companions" class="x_companion_icon" width="24px" height="24px"}
           <div class="title">{__("Companions")}</div>
         </a>
       </div>

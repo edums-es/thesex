@@ -1,5 +1,5 @@
 {
-  "version": "1.6.2-thesex.6",
+  "version": "1.6.3-thesex.1",
   "sngine": "4.4.2",
-  "changelog": "Secure Stone/Pagar.me V5 and Woovi/OpenPix hosted payments with idempotent webhooks"
+  "changelog": "Responsive mobile navigation with a custom Companions icon, compact feed tabs, safe areas and stabilized composer, media, menus and modals"
 }
