@@ -223,6 +223,8 @@ return [
   'Discover' => 'Descobrir',
   'Popular' => 'Em alta',
   'Recent' => 'Recentes',
+  'Explore' => 'Explorar',
+  'Main Menu' => 'Menu principal',
   'Upgrade to Pro' => 'Assinar plano Pro',
   'Saved' => 'Salvos',
   'Messages' => 'Mensagens',

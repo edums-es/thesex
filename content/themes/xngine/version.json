@@ -1,5 +1,5 @@
 {
-  "version": "1.6.3-thesex.1",
+  "version": "1.6.3-thesex.2",
   "sngine": "4.4.2",
-  "changelog": "Responsive mobile navigation with a custom Companions icon, compact feed tabs, safe areas and stabilized composer, media, menus and modals"
+  "changelog": "Focused five-item mobile navigation with a dedicated bottom-sheet menu for secondary destinations"
 }

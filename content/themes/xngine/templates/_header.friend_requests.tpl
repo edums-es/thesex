@@ -1,5 +1,5 @@
-<div class="dropend js_live-requests x_nav_secondary_mobile_wrapper">
-	<a href="{$system['system_url']}/people/friend_requests" class="d-block py-1 body-color x_side_links x_nav_secondary_mobile {if $view == "friend_requests"}fw-semibold main{/if}">
+<div class="dropend js_live-requests">
+	<a href="{$system['system_url']}/people/friend_requests" class="d-block py-1 body-color x_side_links {if $view == "friend_requests"}fw-semibold main{/if}">
 		<div class="d-inline-flex align-items-center position-relative main_bg_half">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="27" height="27" color="currentColor" fill="none">
 				{if $view == "friend_requests"}

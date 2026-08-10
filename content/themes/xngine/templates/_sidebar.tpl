@@ -44,7 +44,7 @@
 {/if}
 
 {if $system['reels_enabled']}
-	<a href="{$system['system_url']}/reels" class="d-block py-1 body-color x_side_links x_nav_secondary_mobile {if $page == "reels"}fw-semibold main{/if}">
+	<a href="{$system['system_url']}/reels" class="d-block py-1 body-color x_side_links {if $page == "reels"}fw-semibold main{/if}">
 		<div class="d-inline-flex align-items-center position-relative main_bg_half">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="27" height="27" color="currentColor" fill="none">
 				{if $page == "reels"}
@@ -114,18 +114,6 @@
 	</a>
 
 	<div class="dropdown-menu x_side_more_menu">
-		{if $system['reels_enabled']}
-			<a class='dropdown-item d-none x_show_mobile_secondary {if $page == "reels"}active {/if}' href="{$system['system_url']}/reels">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="currentColor" fill="none"><path d="M2.5 7.5H21.5M17 2.5L14 7.5M10 2.5L7 7.5" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M2.5 12C2.5 7.52 2.5 5.28 3.89 3.89C5.28 2.5 7.52 2.5 12 2.5C16.48 2.5 18.72 2.5 20.11 3.89C21.5 5.28 21.5 7.52 21.5 12C21.5 16.48 21.5 18.72 20.11 20.11C18.72 21.5 16.48 21.5 12 21.5C7.52 21.5 5.28 21.5 3.89 20.11C2.5 18.72 2.5 16.48 2.5 12Z" stroke="currentColor" stroke-width="1.75"/><path d="M14.95 14.9C14.8 15.52 14.09 15.96 12.65 16.85C11.27 17.71 10.58 18.13 10.02 17.96C9 17.65 9 16.25 9 14.5C9 12.75 9 11.35 10.02 11.04C10.58 10.87 11.27 11.29 12.65 12.15C14.09 13.04 14.8 13.48 14.95 14.1C15.02 14.36 15.02 14.64 14.95 14.9Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg>
-				{__("Reels")}
-			</a>
-		{/if}
-		{if $user->_logged_in && $system['friends_enabled']}
-			<a class='dropdown-item d-none x_show_mobile_secondary {if $view == "friend_requests"}active {/if}' href="{$system['system_url']}/people/friend_requests">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="currentColor" fill="none"><path d="M4.48 16.11C3.3 16.74.21 18.03 2.09 19.65C3.01 20.44 4.04 21 5.33 21H12.67C13.96 21 14.99 20.44 15.91 19.65C17.79 18.03 14.7 16.74 13.52 16.11C10.75 14.63 7.25 14.63 4.48 16.11Z" stroke="currentColor" stroke-width="1.75"/><path d="M13 7.5C13 9.71 11.21 11.5 9 11.5C6.79 11.5 5 9.71 5 7.5C5 5.29 6.79 3.5 9 3.5C11.21 3.5 13 5.29 13 7.5Z" stroke="currentColor" stroke-width="1.75"/><path d="M15.5 5.07C15.73 5.02 15.96 5 16.2 5C18.02 5 19.5 6.34 19.5 8C19.5 9.66 18.02 11 16.2 11C15.96 11 15.73 10.98 15.5 10.93M17.5 15C19.17 15 24.08 16.88 21.99 18.74C21.17 19.48 20.26 20 19.11 20H18.62" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
-				{__("Friend Requests")}
-			</a>
-		{/if}
 		{if $user->_logged_in}
 			<a class='dropdown-item d-none x_show_saved_link {if $page == "index" && $view == "saved"}active {/if}' href="{$system['system_url']}/saved">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" color="currentColor" fill="none"><path d="M4 17.9808V9.70753C4 6.07416 4 4.25748 5.17157 3.12874C6.34315 2 8.22876 2 12 2C15.7712 2 17.6569 2 18.8284 3.12874C20 4.25748 20 6.07416 20 9.70753V17.9808C20 20.2867 20 21.4396 19.2272 21.8523C17.7305 22.6514 14.9232 19.9852 13.59 19.1824C12.8168 18.7168 12.4302 18.484 12 18.484C11.5698 18.484 11.1832 18.7168 10.41 19.1824C9.0768 19.9852 6.26947 22.6514 4.77285 21.8523C4 21.4396 4 20.2867 4 17.9808Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /><path d="M4 7H20" stroke="currentColor" stroke-width="2" /></svg>

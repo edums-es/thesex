@@ -242,6 +242,81 @@
 										</div>
 									</div>
 						
+									<!-- focused mobile navigation -->
+									<nav class="x_mobile_bottom_nav" aria-label='{__("Main Menu")}'>
+										<a href="{$system['system_url']}" class="x_mobile_nav_item {if $page == "index" && $view == ""}active{/if}" aria-label='{__("Home")}' title='{__("Home")}'>
+											{include file='__svg_icons.tpl' icon="header-home" class="x_mobile_nav_icon" width="25px" height="25px"}
+										</a>
+										<a href="{$system['system_url']}/acompanhantes" class="x_mobile_nav_item x_mobile_nav_companions {if $page == "acompanhantes"}active{/if}" aria-label='{__("Companions")}' title='{__("Companions")}'>
+											{include file='__svg_icons.tpl' icon="companions" class="x_mobile_nav_icon x_companion_icon" width="25px" height="25px"}
+										</a>
+										<a href="{$system['system_url']}/creators" class="x_mobile_nav_item {if $page == "creators"}active{/if}" aria-label='{__("Creators")}' title='{__("Creators")}'>
+											<i class="fa-solid fa-crown"></i>
+										</a>
+										{if $user->_logged_in}
+											<a href="{$system['system_url']}/messages" class="x_mobile_nav_item {if $page == "messages"}active{/if}" aria-label='{__("Messages")}' title='{__("Messages")}'>
+												{include file='__svg_icons.tpl' icon="header-messages" class="x_mobile_nav_icon" width="25px" height="25px"}
+												{if $user->_data['user_live_messages_counter'] > 0}<span class="x_mobile_nav_badge">{$user->_data['user_live_messages_counter']}</span>{/if}
+											</a>
+										{/if}
+										<div class="dropup x_mobile_nav_menu_wrap">
+											<button type="button" class="x_mobile_nav_item x_mobile_nav_menu_button {if in_array($page, ['notifications', 'reels', 'groups', 'pages', 'market', 'settings']) || ($page == "index" && $view == "saved")}active{/if}" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label='{__("More")}' title='{__("More")}'>
+												{include file='__svg_icons.tpl' icon="header-menu" class="x_mobile_nav_icon" width="24px" height="24px"}
+												{if $user->_logged_in && $user->_data['user_live_notifications_counter'] > 0}<span class="x_mobile_nav_badge">{$user->_data['user_live_notifications_counter']}</span>{/if}
+											</button>
+											<div class="dropdown-menu x_mobile_nav_sheet">
+												<span class="x_mobile_nav_sheet_handle" aria-hidden="true"></span>
+												<div class="x_mobile_nav_sheet_header">
+													<strong>{__("More")}</strong>
+													<small>{__("Explore")}</small>
+												</div>
+												<div class="x_mobile_nav_grid">
+													{if $user->_logged_in}
+														<a href="{$system['system_url']}/notifications" class="x_mobile_nav_menu_item {if $page == "notifications"}active{/if}">
+															<span class="x_mobile_nav_menu_icon"><i class="fa-regular fa-bell"></i></span><span>{__("Notifications")}</span>
+															{if $user->_data['user_live_notifications_counter'] > 0}<b>{$user->_data['user_live_notifications_counter']}</b>{/if}
+														</a>
+														<a href="{$system['system_url']}/saved" class="x_mobile_nav_menu_item {if $page == "index" && $view == "saved"}active{/if}">
+															<span class="x_mobile_nav_menu_icon"><i class="fa-regular fa-bookmark"></i></span><span>{__("Saved")}</span>
+														</a>
+														{if $system['friends_enabled']}
+															<a href="{$system['system_url']}/people/friend_requests" class="x_mobile_nav_menu_item {if $view == "friend_requests"}active{/if}">
+																<span class="x_mobile_nav_menu_icon"><i class="fa-solid fa-user-plus"></i></span><span>{__("Friend Requests")}</span>
+																{if $user->_data['user_live_requests_counter'] > 0}<b>{$user->_data['user_live_requests_counter']}</b>{/if}
+															</a>
+														{/if}
+													{/if}
+													{if $system['reels_enabled']}
+														<a href="{$system['system_url']}/reels" class="x_mobile_nav_menu_item {if $page == "reels"}active{/if}">
+															<span class="x_mobile_nav_menu_icon"><i class="fa-solid fa-clapperboard"></i></span><span>{__("Reels")}</span>
+														</a>
+													{/if}
+													{if $system['groups_enabled']}
+														<a href="{$system['system_url']}/groups" class="x_mobile_nav_menu_item {if $page == "groups"}active{/if}">
+															<span class="x_mobile_nav_menu_icon"><i class="fa-solid fa-user-group"></i></span><span>{__("Groups")}</span>
+														</a>
+													{/if}
+													{if $system['pages_enabled']}
+														<a href="{$system['system_url']}/pages" class="x_mobile_nav_menu_item {if $page == "pages"}active{/if}">
+															<span class="x_mobile_nav_menu_icon"><i class="fa-regular fa-flag"></i></span><span>{__("Pages")}</span>
+														</a>
+													{/if}
+													{if $system['market_enabled']}
+														<a href="{$system['system_url']}/market" class="x_mobile_nav_menu_item {if $page == "market"}active{/if}">
+															<span class="x_mobile_nav_menu_icon"><i class="fa-solid fa-store"></i></span><span>{__("Market")}</span>
+														</a>
+													{/if}
+													{if $user->_logged_in}
+														<a href="{$system['system_url']}/settings" class="x_mobile_nav_menu_item {if $page == "settings"}active{/if}">
+															<span class="x_mobile_nav_menu_icon"><i class="fa-solid fa-gear"></i></span><span>{__("Settings")}</span>
+														</a>
+													{/if}
+												</div>
+											</div>
+										</div>
+									</nav>
+									<!-- focused mobile navigation -->
+
 									<!-- user-menu -->
 									<div class="py-1 x_user_mobi_menu">
 										<div class="dropup my-2">
