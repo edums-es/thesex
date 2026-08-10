@@ -589,35 +589,29 @@ function init_system()
   /* set system langauge */
   $system['current_language'] = DEFAULT_LOCALE;
   $user_language = get_user_language_country()['language'];
-  if (isset($_GET['lang'])) {
+  if (isset($_GET['lang']) && array_key_exists($_GET['lang'], $system['languages'])) {
     /* get GET for web app */
-    if (array_key_exists($_GET['lang'], $system['languages'])) {
-      $system['language'] = $system['languages'][$_GET['lang']];
-      if ($system['language']['code'] != DEFAULT_LOCALE) {
-        $gettextTranslator = $gettextLoader->loadFile(ABSPATH . 'content/languages/locale/' . $system['language']['code'] . '/LC_MESSAGES/messages.po');
-      }
-      $system['current_language'] = $system['language']['code'];
-      /* set language cookie */
-      set_cookie('s_lang', $_GET['lang']);
+    $system['language'] = $system['languages'][$_GET['lang']];
+    if ($system['language']['code'] != DEFAULT_LOCALE) {
+      $gettextTranslator = $gettextLoader->loadFile(ABSPATH . 'content/languages/locale/' . $system['language']['code'] . '/LC_MESSAGES/messages.po');
     }
-  } elseif (isset($_COOKIE['s_lang'])) {
+    $system['current_language'] = $system['language']['code'];
+    /* set language cookie */
+    set_cookie('s_lang', $_GET['lang']);
+  } elseif (isset($_COOKIE['s_lang']) && array_key_exists($_COOKIE['s_lang'], $system['languages'])) {
     /* get cookie for web app */
-    if (array_key_exists($_COOKIE['s_lang'], $system['languages'])) {
-      $system['language'] = $system['languages'][$_COOKIE['s_lang']];
-      if ($system['language']['code'] != DEFAULT_LOCALE) {
-        $gettextTranslator = $gettextLoader->loadFile(ABSPATH . 'content/languages/locale/' . $system['language']['code'] . '/LC_MESSAGES/messages.po');
-      }
-      $system['current_language'] = $system['language']['code'];
+    $system['language'] = $system['languages'][$_COOKIE['s_lang']];
+    if ($system['language']['code'] != DEFAULT_LOCALE) {
+      $gettextTranslator = $gettextLoader->loadFile(ABSPATH . 'content/languages/locale/' . $system['language']['code'] . '/LC_MESSAGES/messages.po');
     }
-  } elseif (isset(_getallheaders()["x-lang"])) {
+    $system['current_language'] = $system['language']['code'];
+  } elseif (isset(_getallheaders()["x-lang"]) && array_key_exists(_getallheaders()["x-lang"], $system['languages'])) {
     /* get header for web app */
-    if (array_key_exists(_getallheaders()["x-lang"], $system['languages'])) {
-      $system['language'] = $system['languages'][_getallheaders()["x-lang"]];
-      if ($system['language']['code'] != DEFAULT_LOCALE) {
-        $gettextTranslator = $gettextLoader->loadFile(ABSPATH . 'content/languages/locale/' . $system['language']['code'] . '/LC_MESSAGES/messages.po');
-      }
-      $system['current_language'] = $system['language']['code'];
+    $system['language'] = $system['languages'][_getallheaders()["x-lang"]];
+    if ($system['language']['code'] != DEFAULT_LOCALE) {
+      $gettextTranslator = $gettextLoader->loadFile(ABSPATH . 'content/languages/locale/' . $system['language']['code'] . '/LC_MESSAGES/messages.po');
     }
+    $system['current_language'] = $system['language']['code'];
   } elseif ($system['auto_language_detection'] && $user_language && array_key_exists($user_language, $system['languages'])) {
     /* get user language */
     $system['language'] = $system['languages'][$user_language];
