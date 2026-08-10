@@ -268,6 +268,7 @@ return [
   'Creator dashboard' => 'Painel do criador',
   'Edit profile' => 'Editar perfil',
   'Subscriptions from' => 'Assinaturas a partir de',
+  'month' => 'mês',
   'Subscribe now' => 'Assinar agora',
   'Subscription active' => 'Assinatura ativa',
   'Message' => 'Mensagem',
