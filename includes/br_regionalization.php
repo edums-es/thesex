@@ -46,25 +46,18 @@ function br_regionalization_apply()
   try {
     $db->begin_transaction();
 
-    /* canonical Brazil country */
+    /* essential regional catalog */
     br_regionalization_query("DELETE FROM system_countries WHERE country_code = 'BR' AND country_id <> " . BR_COUNTRY_ID);
     br_regionalization_query("INSERT INTO system_countries (country_id, country_code, country_name, phone_code, country_vat, `default`, enabled, country_order)
       VALUES (" . BR_COUNTRY_ID . ", 'BR', 'Brasil', '+55', NULL, '1', '1', 1)
       ON DUPLICATE KEY UPDATE country_code = 'BR', country_name = 'Brasil', phone_code = '+55', `default` = '1', enabled = '1', country_order = 1");
     br_regionalization_query("UPDATE users SET user_country = " . BR_COUNTRY_ID . ", user_language = 'pt_br'");
-    br_regionalization_query("UPDATE pages SET page_country = " . BR_COUNTRY_ID);
-    br_regionalization_query("UPDATE `groups` SET group_country = " . BR_COUNTRY_ID);
-    br_regionalization_query("UPDATE events SET event_country = " . BR_COUNTRY_ID);
-    br_regionalization_query("UPDATE ads_campaigns SET audience_countries = '" . BR_COUNTRY_ID . "' WHERE audience_countries <> ''");
-    br_regionalization_query("DELETE FROM auto_connect WHERE country_id <> " . BR_COUNTRY_ID);
     br_regionalization_query("DELETE FROM system_countries WHERE country_id <> " . BR_COUNTRY_ID);
 
-    /* canonical BRL currency, including existing job/course content */
+    /* canonical BRL currency */
     br_regionalization_query("INSERT INTO system_currencies (currency_id, name, code, symbol, dir, `default`, enabled)
       VALUES (" . BR_CURRENCY_ID . ", 'Real brasileiro', 'BRL', 'R$', 'left', '1', '1')
       ON DUPLICATE KEY UPDATE name = 'Real brasileiro', code = 'BRL', symbol = 'R$', dir = 'left', `default` = '1', enabled = '1'");
-    br_regionalization_query("UPDATE posts_jobs SET salary_minimum_currency = " . BR_CURRENCY_ID . ", salary_maximum_currency = " . BR_CURRENCY_ID);
-    br_regionalization_query("UPDATE posts_courses SET fees_currency = " . BR_CURRENCY_ID);
     br_regionalization_query("DELETE FROM system_currencies WHERE currency_id <> " . BR_CURRENCY_ID);
 
     /* Portuguese is public; English is retained disabled as source fallback */
@@ -76,18 +69,13 @@ function br_regionalization_apply()
     br_regionalization_query("INSERT INTO system_languages (language_id, code, title, flag, dir, `default`, enabled, language_order)
       VALUES (" . BR_LANGUAGE_ID . ", 'pt_br', 'Português (Brasil)', 'flags/pt_br.png', 'LTR', '1', '1', 1)
       ON DUPLICATE KEY UPDATE code = 'pt_br', title = 'Português (Brasil)', flag = 'flags/pt_br.png', dir = 'LTR', `default` = '1', enabled = '1', language_order = 1");
-    br_regionalization_query("UPDATE pages SET page_language = " . BR_LANGUAGE_ID);
-    br_regionalization_query("UPDATE `groups` SET group_language = " . BR_LANGUAGE_ID);
-    br_regionalization_query("UPDATE events SET event_language = " . BR_LANGUAGE_ID);
-    br_regionalization_query("UPDATE widgets SET language_id = " . BR_LANGUAGE_ID . " WHERE language_id <> 0");
     br_regionalization_query("DELETE FROM system_languages WHERE language_id NOT IN (" . EN_FALLBACK_LANGUAGE_ID . ", " . BR_LANGUAGE_ID . ")");
 
     /* Brazilian presentation defaults */
     br_regionalization_query("INSERT INTO system_options (option_name, option_value) VALUES
       ('auto_language_detection', '0'),
       ('system_datetime_format', 'd/m/Y H:i'),
-      ('br_only_mode', '1'),
-      ('br_regionalization_version', '" . BR_REGIONALIZATION_VERSION . "')
+      ('br_only_mode', '1')
       ON DUPLICATE KEY UPDATE option_value = VALUES(option_value)");
     br_regionalization_query("UPDATE system_options SET option_value = 'Voltaremos em breve' WHERE option_name = 'system_message' AND option_value = 'We will Back Soon'");
     br_regionalization_query("UPDATE system_options SET option_value = 'Compartilhe momentos, conheça pessoas e acompanhe seus criadores favoritos' WHERE option_name = 'system_description' AND option_value = 'Share your memories, connect with others, make new friends'");
@@ -97,6 +85,43 @@ function br_regionalization_apply()
   } catch (Throwable $error) {
     $db->rollback();
     error_log($error->getMessage());
+    return;
+  }
+
+  /* normalize optional modules without allowing one absent module to block PT-BR */
+  $optional_queries = [
+    'pages' => "UPDATE pages SET page_country = " . BR_COUNTRY_ID . ", page_language = " . BR_LANGUAGE_ID,
+    'groups' => "UPDATE `groups` SET group_country = " . BR_COUNTRY_ID . ", group_language = " . BR_LANGUAGE_ID,
+    'events' => "UPDATE events SET event_country = " . BR_COUNTRY_ID . ", event_language = " . BR_LANGUAGE_ID,
+    'ads_campaigns' => "UPDATE ads_campaigns SET audience_countries = '" . BR_COUNTRY_ID . "' WHERE audience_countries <> ''",
+    'auto_connect' => "DELETE FROM auto_connect WHERE country_id <> " . BR_COUNTRY_ID,
+    'posts_jobs' => "UPDATE posts_jobs SET salary_minimum_currency = " . BR_CURRENCY_ID . ", salary_maximum_currency = " . BR_CURRENCY_ID,
+    'posts_courses' => "UPDATE posts_courses SET fees_currency = " . BR_CURRENCY_ID,
+    'widgets' => "UPDATE widgets SET language_id = " . BR_LANGUAGE_ID . " WHERE language_id <> 0",
+  ];
+  $optional_success = true;
+  foreach ($optional_queries as $table => $query) {
+    $safe_table = $db->real_escape_string($table);
+    $table_result = $db->query("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = '" . $safe_table . "' LIMIT 1");
+    if (!$table_result || $table_result->num_rows === 0) {
+      continue;
+    }
+    try {
+      br_regionalization_query($query);
+    } catch (Throwable $error) {
+      $optional_success = false;
+      error_log($error->getMessage());
+    }
+  }
+
+  if ($optional_success) {
+    try {
+      br_regionalization_query("INSERT INTO system_options (option_name, option_value)
+        VALUES ('br_regionalization_version', '" . BR_REGIONALIZATION_VERSION . "')
+        ON DUPLICATE KEY UPDATE option_value = VALUES(option_value)");
+    } catch (Throwable $error) {
+      error_log($error->getMessage());
+    }
   }
 }
 
