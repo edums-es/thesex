@@ -29,11 +29,15 @@ try {
   switch ($_GET['do']) {
     case 'edit':
       /* valid inputs */
-      if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+      if (!isset($_GET['id']) || !is_numeric($_GET['id']) || (int) $_GET['id'] !== BR_CURRENCY_ID) {
         _error(400);
       }
       /* prepare */
-      $_POST['enabled'] = (isset($_POST['enabled'])) ? '1' : '0';
+      $_POST['enabled'] = '1';
+      $_POST['name'] = 'Real brasileiro';
+      $_POST['code'] = 'BRL';
+      $_POST['symbol'] = 'R$';
+      $_POST['dir'] = 'left';
       /* update */
       $db->query(sprintf("UPDATE system_currencies SET enabled = %s, name = %s, code = %s, symbol = %s, dir = %s WHERE currency_id = %s", secure($_POST['enabled']), secure($_POST['name']), secure($_POST['code']), secure($_POST['symbol']), secure($_POST['dir']), secure($_GET['id'], 'int')));
       /* return */
@@ -41,13 +45,7 @@ try {
       break;
 
     case 'add':
-      /* prepare */
-      $_POST['enabled'] = (isset($_POST['enabled'])) ? '1' : '0';
-      /* insert */
-      $db->query(sprintf("INSERT INTO system_currencies (enabled, name, code, symbol, dir) VALUES (%s, %s, %s, %s, %s)", secure($_POST['enabled']), secure($_POST['name']), secure($_POST['code']), secure($_POST['symbol']), secure($_POST['dir'])));
-      /* return */
-      return_json(['callback' => 'window.location = "' . $system['system_url'] . '/' . $control_panel['url'] . '/currencies";']);
-      break;
+      throw new Exception('O modo Brasil não permite adicionar outras moedas');
 
     default:
       _error(400);

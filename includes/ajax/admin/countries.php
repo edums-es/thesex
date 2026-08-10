@@ -29,12 +29,16 @@ try {
   switch ($_GET['do']) {
     case 'edit':
       /* valid inputs */
-      if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+      if (!isset($_GET['id']) || !is_numeric($_GET['id']) || (int) $_GET['id'] !== BR_COUNTRY_ID) {
         _error(400);
       }
       /* prepare */
-      $_POST['default'] = (isset($_POST['default'])) ? '1' : '0';
-      $_POST['enabled'] = (isset($_POST['enabled'])) ? '1' : '0';
+      $_POST['default'] = '1';
+      $_POST['enabled'] = '1';
+      $_POST['country_code'] = 'BR';
+      $_POST['country_name'] = 'Brasil';
+      $_POST['phone_code'] = '+55';
+      $_POST['country_order'] = 1;
       /* if default is set -> set all countries as not default first */
       if ($_POST['default']) {
         $db->query("UPDATE system_countries SET system_countries.default = '0'");
@@ -46,18 +50,7 @@ try {
       break;
 
     case 'add':
-      /* prepare */
-      $_POST['default'] = (isset($_POST['default'])) ? '1' : '0';
-      $_POST['enabled'] = (isset($_POST['enabled'])) ? '1' : '0';
-      /* if default is set -> set all countries as not default first */
-      if ($_POST['default']) {
-        $db->query("UPDATE system_countries SET system_countries.default = '0'");
-      }
-      /* insert */
-      $db->query(sprintf("INSERT INTO system_countries (system_countries.default, `enabled`, country_code, country_name, phone_code, country_vat, country_order) VALUES (%s, %s, %s, %s, %s, %s, %s)", secure($_POST['default']), secure($_POST['enabled']), secure($_POST['country_code']), secure($_POST['country_name']), secure($_POST['phone_code']), secure($_POST['country_vat'], 'float'), secure($_POST['country_order'], 'int')));
-      /* return */
-      return_json(['callback' => 'window.location = "' . $system['system_url'] . '/' . $control_panel['url'] . '/countries";']);
-      break;
+      throw new Exception('O modo Brasil não permite adicionar outros países');
 
     default:
       _error(400);

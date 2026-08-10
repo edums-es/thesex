@@ -8811,28 +8811,11 @@ function get_user_browser()
 /**
  * get_user_language_country
  *
- * @return string
+ * @return array
  */
 function get_user_language_country()
 {
-  if (empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-    return ['language' => null, 'country' => null];
-  }
-  $languages = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-  $primary = strtolower(explode(';', $languages[0])[0]);
-  $primary = str_replace('-', '_', $primary);
-  /* force 'ar' to 'ar_sa' */
-  if (strpos($primary, 'ar') === 0) {
-    return ['language' => 'ar_sa', 'country' => 'SA'];
-  }
-  /* ensure language has a country code */
-  if (!strpos($primary, '_')) {
-    $primary .= "_$primary";
-  }
-  return [
-    'language' => $primary,
-    'country' => strtoupper(explode('_', $primary)[1])
-  ];
+  return ['language' => 'pt_br', 'country' => 'BR'];
 }
 
 

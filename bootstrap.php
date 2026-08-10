@@ -22,6 +22,7 @@ require(ABSPATH . 'vendor/autoload.php');
 // get functions
 require(ABSPATH . 'includes/functions.php');
 require(ABSPATH . 'includes/payment_gateways_br.php');
+require(ABSPATH . 'includes/br_regionalization.php');
 
 
 // check config file
@@ -72,9 +73,14 @@ try {
 }
 
 
+// enforce the Brazil-only regional catalog before loading system settings
+br_regionalization_apply();
+
+
 // init system
 try {
   $system = init_system();
+  br_regionalization_apply_defaults($system);
   br_payments_apply_defaults($system);
 } catch (Exception $e) {
   _error(__("Error"), $e->getMessage());

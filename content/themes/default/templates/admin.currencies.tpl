@@ -1,6 +1,6 @@
 <div class="card">
   <div class="card-header with-icon">
-    {if $sub_view == ""}
+    {if $sub_view == "" && !$system['br_only_mode']}
       <div class="float-end">
         <a href="{$system['system_url']}/{$control_panel['url']}/currencies/add" class="btn btn-md btn-primary">
           <i class="fa fa-plus mr5"></i>{__("Add New Currency")}
@@ -61,9 +61,11 @@
                   <a data-bs-toggle="tooltip" title='{__("Edit")}' href="{$system['system_url']}/{$control_panel['url']}/currencies/edit/{$row['currency_id']}" class="btn btn-sm btn-icon btn-rounded btn-primary">
                     <i class="fa fa-pencil-alt"></i>
                   </a>
-                  <button data-bs-toggle="tooltip" title='{__("Delete")}' class="btn btn-sm btn-icon btn-rounded btn-danger js_admin-deleter" data-handle="currency" data-id="{$row['currency_id']}">
-                    <i class="fa fa-trash-alt"></i>
-                  </button>
+                  {if !$system['br_only_mode']}
+                    <button data-bs-toggle="tooltip" title='{__("Delete")}' class="btn btn-sm btn-icon btn-rounded btn-danger js_admin-deleter" data-handle="currency" data-id="{$row['currency_id']}">
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  {/if}
                 </td>
               </tr>
             {/foreach}

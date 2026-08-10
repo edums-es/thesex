@@ -32,9 +32,18 @@ try {
       if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
         _error(400);
       }
+      $language_id = (int) $_GET['id'];
+      if (!in_array($language_id, [EN_FALLBACK_LANGUAGE_ID, BR_LANGUAGE_ID], true)) {
+        throw new Exception('O modo Brasil permite apenas Português (Brasil) e o inglês técnico de reserva');
+      }
       /* prepare */
-      $_POST['default'] = (isset($_POST['default'])) ? '1' : '0';
-      $_POST['enabled'] = (isset($_POST['enabled'])) ? '1' : '0';
+      $_POST['default'] = ($language_id === BR_LANGUAGE_ID) ? '1' : '0';
+      $_POST['enabled'] = ($language_id === BR_LANGUAGE_ID) ? '1' : '0';
+      $_POST['code'] = ($language_id === BR_LANGUAGE_ID) ? 'pt_br' : 'en_us';
+      $_POST['title'] = ($language_id === BR_LANGUAGE_ID) ? 'Português (Brasil)' : 'English (fallback)';
+      $_POST['flag'] = ($language_id === BR_LANGUAGE_ID) ? 'flags/pt_br.png' : 'flags/en_us.png';
+      $_POST['dir'] = 'LTR';
+      $_POST['language_order'] = ($language_id === BR_LANGUAGE_ID) ? 1 : 2;
       /* if default is set -> set all languages as not default first */
       if ($_POST['default']) {
         $db->query("UPDATE system_languages SET system_languages.default = '0'");
@@ -48,20 +57,7 @@ try {
       break;
 
     case 'add':
-      /* prepare */
-      $_POST['default'] = (isset($_POST['default'])) ? '1' : '0';
-      $_POST['enabled'] = (isset($_POST['enabled'])) ? '1' : '0';
-      /* if default is set -> set all languages as not default first */
-      if ($_POST['default']) {
-        $db->query("UPDATE system_languages SET system_languages.default = '0'");
-      }
-      /* insert */
-      $db->query(sprintf("INSERT INTO system_languages (system_languages.default, enabled, code, title, flag, dir, language_order) VALUES (%s, %s, %s, %s, %s, %s, %s)", secure($_POST['default']), secure($_POST['enabled']), secure($_POST['code']), secure($_POST['title']), secure($_POST['flag']), secure($_POST['dir']), secure($_POST['language_order'], 'int')));
-      /* remove pending uploads */
-      remove_pending_uploads([$_POST['flag']]);
-      /* return */
-      return_json(['callback' => 'window.location = "' . $system['system_url'] . '/' . $control_panel['url'] . '/languages";']);
-      break;
+      throw new Exception('O modo Brasil não permite adicionar outros idiomas');
 
     default:
       _error(400);

@@ -48,7 +48,7 @@ try {
       if (!$user->_is_admin) {
         modal("MESSAGE", __("System Message"), __("You don't have the right permission to access this"));
       }
-      $db->query(sprintf("DELETE FROM system_languages WHERE language_id = %s", secure($_POST['id'], 'int')));
+      throw new Exception('Os idiomas regionais do modo Brasil não podem ser excluídos');
       break;
 
     case 'country':
@@ -56,7 +56,7 @@ try {
       if (!$user->_is_admin) {
         modal("MESSAGE", __("System Message"), __("You don't have the right permission to access this"));
       }
-      $db->query(sprintf("DELETE FROM system_countries WHERE country_id = %s", secure($_POST['id'], 'int')));
+      throw new Exception('O Brasil não pode ser excluído enquanto o modo Brasil estiver ativo');
       break;
 
     case 'currency':
@@ -64,7 +64,7 @@ try {
       if (!$user->_is_admin) {
         modal("MESSAGE", __("System Message"), __("You don't have the right permission to access this"));
       }
-      $db->query(sprintf("DELETE FROM system_currencies WHERE currency_id = %s", secure($_POST['id'], 'int')));
+      throw new Exception('O Real brasileiro não pode ser excluído enquanto o modo Brasil estiver ativo');
       break;
 
     case 'gender':

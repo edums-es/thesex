@@ -1,6 +1,6 @@
 <div class="card">
   <div class="card-header with-icon">
-    {if $sub_view == ""}
+    {if $sub_view == "" && !$system['br_only_mode']}
       <div class="float-end">
         <a href="{$system['system_url']}/{$control_panel['url']}/languages/add" class="btn btn-md btn-primary">
           <i class="fa fa-plus mr5"></i>{__("Add New Language")}
@@ -64,9 +64,11 @@
                   <a data-bs-toggle="tooltip" title='{__("Edit")}' href="{$system['system_url']}/{$control_panel['url']}/languages/edit/{$row['language_id']}" class="btn btn-sm btn-icon btn-rounded btn-primary">
                     <i class="fa fa-pencil-alt"></i>
                   </a>
-                  <button data-bs-toggle="tooltip" title='{__("Delete")}' class="btn btn-sm btn-icon btn-rounded btn-danger js_admin-deleter" data-handle="language" data-id="{$row['language_id']}">
-                    <i class="fa fa-trash-alt"></i>
-                  </button>
+                  {if !$system['br_only_mode']}
+                    <button data-bs-toggle="tooltip" title='{__("Delete")}' class="btn btn-sm btn-icon btn-rounded btn-danger js_admin-deleter" data-handle="language" data-id="{$row['language_id']}">
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+                  {/if}
                 </td>
               </tr>
             {/foreach}
@@ -116,7 +118,7 @@
           <div class="col-md-9">
             <input class="form-control" name="code" value="{$data['code']}">
             <div class="form-text">
-              {__("Language country_code, For Example: en_us, ar_sa or fr_fr")}
+              Código regional do idioma. Exemplos: pt_br ou en_us
             </div>
           </div>
         </div>
@@ -242,7 +244,7 @@
           <div class="col-md-9">
             <input class="form-control" name="code">
             <div class="form-text">
-              {__("Language country_code, For Example: en_us, ar_sa or fr_fr")}
+              Código regional do idioma. Exemplos: pt_br ou en_us
             </div>
           </div>
         </div>
