@@ -469,9 +469,10 @@ trait MonetizationTrait
    * @param integer $plan_id
    * @param integer $user_id
    * @param boolean $resubscribe
+   * @param float|null $payment_price Frozen checkout price (for verified asynchronous payments)
    * @return string
    */
-  public function subscribe($plan_id, $user_id = null, $resubscribe = false)
+  public function subscribe($plan_id, $user_id = null, $resubscribe = false, $payment_price = null)
   {
     global $system, $db, $date;
     /* check monetization enabled */
@@ -549,7 +550,9 @@ trait MonetizationTrait
     /* add as subscriber */
     $db->query(sprintf("INSERT INTO subscribers (user_id, node_id, node_type, plan_id, time) VALUES (%s, %s, %s, %s, %s)", secure($user_id, 'int'),  secure($monetization_plan['node_id'], 'int'), secure($monetization_plan['node_type']), secure($plan_id), secure($date)));
     /* prepare commission */
-    $subscription_price = (isset($monetization_plan['discounted_price']) && $monetization_plan['discounted_price'] > 0) ? $monetization_plan['discounted_price'] : $monetization_plan['price'];
+    $subscription_price = ($payment_price !== null)
+      ? (float) $payment_price
+      : ((isset($monetization_plan['discounted_price']) && $monetization_plan['discounted_price'] > 0) ? $monetization_plan['discounted_price'] : $monetization_plan['price']);
     $content_price = $subscription_price;
     $commission = ($system['monetization_commission']) ? $content_price * ($system['monetization_commission'] / 100) : 0;
     $content_price = $content_price - $commission;
@@ -566,7 +569,7 @@ trait MonetizationTrait
       /* get the seller referrer */
       $get_seller_referrer = $db->query(sprintf("SELECT user_referrer_id FROM users WHERE user_id = %s", secure($content_creator_id, 'int')));
       $seller_referrer_id =  $get_seller_referrer->fetch_assoc()['user_referrer_id'];
-      $this->process_affiliates("packages", $content_creator_id, $seller_referrer_id, $monetization_plan['price']);
+      $this->process_affiliates("packages", $content_creator_id, $seller_referrer_id, $subscription_price);
     } else {
       if ($user_id == $this->_data['user_id']) {
         $user_referrer_id = $this->_data['user_referrer_id'];
@@ -574,7 +577,7 @@ trait MonetizationTrait
         $get_user_referrer = $db->query(sprintf("SELECT user_referrer_id FROM users WHERE user_id = %s", secure($user_id, 'int')));
         $user_referrer_id =  $get_user_referrer->fetch_assoc()['user_referrer_id'];
       }
-      $this->process_affiliates("packages", $user_id, $user_referrer_id, $monetization_plan['price']);
+      $this->process_affiliates("packages", $user_id, $user_referrer_id, $subscription_price);
     }
     /* return */
     return $returned_link;
@@ -724,9 +727,10 @@ trait MonetizationTrait
    * 
    * @param integer $post_id
    * @param integer $user_id
+   * @param float|null $payment_price Frozen checkout price (for verified asynchronous payments)
    * @return void
    */
-  public function unlock_paid_post($post_id, $user_id = null)
+  public function unlock_paid_post($post_id, $user_id = null, $payment_price = null)
   {
     global $system, $db, $date;
     /* check monetization enabled */
@@ -753,7 +757,9 @@ trait MonetizationTrait
     /* unlock the post */
     $db->query(sprintf("INSERT INTO posts_paid (post_id, user_id, time) VALUES (%s, %s, %s)", secure($post_id, 'int'), secure($user_id, 'int'), secure($date)));
     /* check if the post has a discount */
-    if ($post['post_price_discounted']) {
+    if ($payment_price !== null) {
+      $post['post_price'] = (float) $payment_price;
+    } elseif ($post['post_price_discounted']) {
       $post['post_price'] = $post['post_price_discounted'];
     }
     /* prepare commission */

@@ -21,6 +21,7 @@ require(ABSPATH . 'vendor/autoload.php');
 
 // get functions
 require(ABSPATH . 'includes/functions.php');
+require(ABSPATH . 'includes/payment_gateways_br.php');
 
 
 // check config file
@@ -74,6 +75,7 @@ try {
 // init system
 try {
   $system = init_system();
+  br_payments_apply_defaults($system);
 } catch (Exception $e) {
   _error(__("Error"), $e->getMessage());
 }
@@ -107,12 +109,12 @@ if (!$system['system_live'] && ((!$user->_logged_in && !isset($override_shutdown
 }
 
 /* check if the viewer IP is banned */
-if ($system['viewer_ip_banned']) {
+if ($system['viewer_ip_banned'] && !defined('PAYMENT_WEBHOOK_CONTEXT')) {
   _error(__("System Message"), __("Your IP has been blocked"));
 }
 
 /* check if the viewer is banned */
-if ($user->_is_banned) {
+if ($user->_is_banned && !defined('PAYMENT_WEBHOOK_CONTEXT')) {
   _error(__("System Message"), $user->_data['user_banned_message']);
 }
 
@@ -120,7 +122,9 @@ if ($user->_is_banned) {
 // 🚀 Starting the web app ...
 
 // log session
-$user->log_session();
+if (!defined('PAYMENT_WEBHOOK_CONTEXT')) {
+  $user->log_session();
+}
 
 
 // get emojis

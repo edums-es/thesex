@@ -2444,6 +2444,24 @@
                   </button>
                 </div>
               </div>
+			{/if}
+			{if $system['system_currency'] == 'BRL' && $system['pagarme_enabled']}
+              <div class="col-12 col-sm-6 mb10">
+                <div class="d-grid">
+                  <button class="js_payment-brazil btn btn-md btn-payment" data-gateway="pagarme" data-handle="{literal}{{handle}}{/literal}" {literal}{{#id}}{/literal} data-id="{literal}{{id}}{/literal}" {literal}{{/id}}{/literal} {literal}{{#price}}{/literal} data-price="{literal}{{price}}{/literal}" {literal}{{/price}}{/literal}>
+                    <i class="fas fa-credit-card mr5"></i>{__("Stone / Pagar.me")}
+                  </button>
+                </div>
+              </div>
+            {/if}
+			{if $system['system_currency'] == 'BRL' && $system['woovi_enabled']}
+              <div class="col-12 col-sm-6 mb10">
+                <div class="d-grid">
+                  <button class="js_payment-brazil btn btn-md btn-payment" data-gateway="woovi" data-handle="{literal}{{handle}}{/literal}" {literal}{{#id}}{/literal} data-id="{literal}{{id}}{/literal}" {literal}{{/id}}{/literal} {literal}{{#price}}{/literal} data-price="{literal}{{price}}{/literal}" {literal}{{/price}}{/literal}>
+                    <i class="fas fa-qrcode mr5"></i>{__("Pix com Woovi")}
+                  </button>
+                </div>
+              </div>
             {/if}
 			{if $system['plisio_enabled']}
               <div class="col-12 col-sm-6 mb10">

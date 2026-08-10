@@ -1085,12 +1085,31 @@ try {
       $_POST['flutterwave_enabled'] = (isset($_POST['flutterwave_enabled'])) ? '1' : '0';
       $_POST['verotel_enabled'] = (isset($_POST['verotel_enabled'])) ? '1' : '0';
       $_POST['mercadopago_enabled'] = (isset($_POST['mercadopago_enabled'])) ? '1' : '0';
+      $_POST['pagarme_enabled'] = (isset($_POST['pagarme_enabled'])) ? '1' : '0';
+      $_POST['woovi_enabled'] = (isset($_POST['woovi_enabled'])) ? '1' : '0';
       $_POST['plisio_enabled'] = (isset($_POST['plisio_enabled'])) ? '1' : '0';
       $_POST['coinpayments_enabled'] = (isset($_POST['coinpayments_enabled'])) ? '1' : '0';
       $_POST['coinbase_enabled'] = (isset($_POST['coinbase_enabled'])) ? '1' : '0';
       $_POST['ccbill_enabled'] = (isset($_POST['ccbill_enabled'])) ? '1' : '0';
+      $pagarme_mode = (($_POST['pagarme_mode'] ?? '') === 'production') ? 'production' : 'sandbox';
+      $woovi_mode = (($_POST['woovi_mode'] ?? '') === 'production') ? 'production' : 'sandbox';
+      $pagarme_methods = array_values(array_intersect((array) ($_POST['pagarme_payment_methods'] ?? []), ['credit_card', 'pix', 'boleto']));
+      $pagarme_secret_key = trim((string) ($_POST['pagarme_secret_key'] ?? ''));
+      $woovi_app_id = trim((string) ($_POST['woovi_app_id'] ?? ''));
+      if ($_POST['pagarme_enabled'] && $pagarme_secret_key === '' && empty($system['pagarme_secret_key'])) {
+        throw new Exception(__('Enter the Pagar.me Secret Key before enabling it'));
+      }
+      if ($_POST['pagarme_enabled'] && !$pagarme_methods) {
+        throw new Exception(__('Select at least one Pagar.me payment method'));
+      }
+      if ($_POST['woovi_enabled'] && $woovi_app_id === '' && empty($system['woovi_app_id'])) {
+        throw new Exception(__('Enter the Woovi AppID before enabling it'));
+      }
+      if ($_POST['woovi_enabled'] && (!function_exists('openssl_pkey_get_public') || !function_exists('openssl_verify'))) {
+        throw new Exception(__('The PHP OpenSSL extension is required for Woovi webhook validation'));
+      }
       /* update */
-      update_system_options([
+      $payment_options = [
         'paypal_enabled' => secure($_POST['paypal_enabled']),
         'paypal_payouts_enabled' => secure($_POST['paypal_payouts_enabled']),
         'paypal_mode' => secure($_POST['paypal_mode']),
@@ -1154,6 +1173,13 @@ try {
         'mercadopago_enabled' => secure($_POST['mercadopago_enabled']),
         'mercadopago_public_key' => secure($_POST['mercadopago_public_key']),
         'mercadopago_access_token' => secure($_POST['mercadopago_access_token']),
+        'pagarme_enabled' => secure($_POST['pagarme_enabled']),
+        'pagarme_mode' => secure($pagarme_mode),
+        'pagarme_payment_methods' => secure(implode(',', $pagarme_methods)),
+        'pagarme_link_expiration_minutes' => secure(max(5, min(10080, (int) ($_POST['pagarme_link_expiration_minutes'] ?? 60))), 'int'),
+        'woovi_enabled' => secure($_POST['woovi_enabled']),
+        'woovi_mode' => secure($woovi_mode),
+        'woovi_charge_expiration_seconds' => secure(max(300, min(2592000, (int) ($_POST['woovi_charge_expiration_seconds'] ?? 3600))), 'int'),
         'plisio_enabled' => secure($_POST['plisio_enabled']),
         'plisio_secret_key' => secure($_POST['plisio_secret_key']),
         'coinpayments_enabled' => secure($_POST['coinpayments_enabled']),
@@ -1169,7 +1195,15 @@ try {
         'ccbill_salt_key' => secure($_POST['ccbill_salt_key']),
         'ccbill_datalink_username' => secure($_POST['ccbill_datalink_username']),
         'ccbill_datalink_password' => secure($_POST['ccbill_datalink_password']),
-      ]);
+      ];
+      /* Empty secret fields preserve the configured credentials. */
+      if ($pagarme_secret_key !== '') {
+        $payment_options['pagarme_secret_key'] = secure($pagarme_secret_key);
+      }
+      if ($woovi_app_id !== '') {
+        $payment_options['woovi_app_id'] = secure($woovi_app_id);
+      }
+      br_payments_save_settings($payment_options);
       break;
 
     case 'bank':

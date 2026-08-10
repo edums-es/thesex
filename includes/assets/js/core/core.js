@@ -31,6 +31,7 @@ api['payments/epayco'] = ajax_path + "payments/epayco.php";
 api['payments/flutterwave'] = ajax_path + "payments/flutterwave.php";
 api['payments/verotel'] = ajax_path + "payments/verotel.php";
 api['payments/mercadopago'] = ajax_path + "payments/mercadopago.php";
+api['payments/brazil'] = ajax_path + "payments/brazil.php";
 api['payments/plisio'] = ajax_path + "payments/plisio.php";
 api['payments/ccbill'] = ajax_path + "payments/ccbill.php";
 api['payments/ccbill_status_check'] = ajax_path + "payments/ccbill_status_check.php";
@@ -2289,6 +2290,39 @@ $(function () {
         /* handle error */
         show_error_modal();
       });
+  });
+  /* Plisio */
+  /* Stone/Pagar.me and Woovi/OpenPix */
+  $('body').on('click', '.js_payment-brazil', function () {
+    var _this = $(this);
+    var data = {
+      gateway: _this.data('gateway'),
+      handle: _this.data('handle')
+    };
+    var payment_promo_code = $('#payment-promo-code').val();
+    if (!is_empty(payment_promo_code)) {
+      data['promo_code'] = payment_promo_code;
+    }
+    if (data['handle'] == "packages") data['package_id'] = _this.data('id');
+    if (data['handle'] == "wallet") data['price'] = _this.data('price');
+    if (data['handle'] == "donate") {
+      data['post_id'] = _this.data('id');
+      data['price'] = _this.data('price');
+    }
+    if (data['handle'] == "subscribe") data['plan_id'] = _this.data('id');
+    if (data['handle'] == "paid_post") data['post_id'] = _this.data('id');
+    if (data['handle'] == "movies") data['movie_id'] = _this.data('id');
+    if (data['handle'] == "marketplace") data['orders_collection_id'] = _this.data('id');
+
+    button_status(_this, "loading");
+    $.post(api['payments/brazil'], data, function (response) {
+      button_status(_this, "reset");
+      if (!response) return;
+      if (response.callback) eval(response.callback);
+    }, "json").fail(function () {
+      button_status(_this, "reset");
+      show_error_modal();
+    });
   });
   /* Plisio */
   $('body').on('click', '.js_payment-plisio', function () {

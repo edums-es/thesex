@@ -1152,6 +1152,127 @@
 
         <div class="divider"></div>
 
+        <!-- Brazilian Gateways -->
+        <div class="alert alert-info">
+          <div class="fw-semibold">{__("Brazilian payment gateways")}</div>
+          <div class="small">{__("Hosted checkout: card data never passes through this server. Payments are released only after a verified webhook.")}</div>
+        </div>
+
+        <div>
+          <div class="form-table-row">
+            <div class="avatar bg-light d-flex align-items-center justify-content-center">
+              <i class="fas fa-credit-card fa-lg text-primary"></i>
+            </div>
+            <div>
+              <div class="form-label h6">{__("Stone / Pagar.me Enabled")}</div>
+              <div class="form-text d-none d-sm-block">{__("Enable card and Pix payments through Pagar.me Checkout V5")}</div>
+            </div>
+            <div class="text-end">
+              <label class="switch" for="pagarme_enabled">
+                <input type="checkbox" name="pagarme_enabled" id="pagarme_enabled" {if $system['pagarme_enabled']}checked{/if}>
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+          <div class="mt20">
+            <div class="form-group">
+              <label class="form-label">{__("Environment")}</label>
+              <select class="form-select" name="pagarme_mode">
+                <option value="sandbox" {if $system['pagarme_mode'] == "sandbox"}selected{/if}>{__("Sandbox (testing)")}</option>
+                <option value="production" {if $system['pagarme_mode'] == "production"}selected{/if}>{__("Production")}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">{__("Secret Key")}</label>
+              {if !$user->_data['user_demo']}
+                <input type="password" class="form-control" name="pagarme_secret_key" value="" autocomplete="new-password" placeholder="{if $system['pagarme_secret_key']}{__("Configured — leave blank to keep")}{else}sk_test_... / sk_live_...{/if}">
+              {else}
+                <input type="password" class="form-control" value="*********" disabled>
+              {/if}
+              <div class="form-text">{__("Never paste this key into theme files or JavaScript.")}</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">{__("Accepted methods")}</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="pagarme_payment_methods[]" value="credit_card" id="pagarme_method_card" {if in_array('credit_card', explode(',', $system['pagarme_payment_methods']))}checked{/if}>
+                <label class="form-check-label" for="pagarme_method_card">{__("Credit card")}</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="pagarme_payment_methods[]" value="pix" id="pagarme_method_pix" {if in_array('pix', explode(',', $system['pagarme_payment_methods']))}checked{/if}>
+                <label class="form-check-label" for="pagarme_method_pix">Pix</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="pagarme_payment_methods[]" value="boleto" id="pagarme_method_boleto" {if in_array('boleto', explode(',', $system['pagarme_payment_methods']))}checked{/if}>
+                <label class="form-check-label" for="pagarme_method_boleto">{__("Bank slip")}</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">{__("Checkout expiration (minutes)")}</label>
+              <input type="number" min="5" max="10080" class="form-control" name="pagarme_link_expiration_minutes" value="{$system['pagarme_link_expiration_minutes']}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">{__("Webhook URL")}</label>
+              {if $system['pagarme_webhook_secret']}
+                <input type="text" readonly class="form-control" value="{$system['system_url']}/webhooks/pagarme.php?token={$system['pagarme_webhook_secret']}">
+                <div class="form-text">{__("Register this HTTPS URL in Pagar.me for order and charge events.")}</div>
+              {else}
+                <div class="alert alert-warning mb0">{__("Save these settings once to generate the secure webhook URL.")}</div>
+              {/if}
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div>
+          <div class="form-table-row">
+            <div class="avatar bg-light d-flex align-items-center justify-content-center">
+              <i class="fas fa-qrcode fa-lg text-success"></i>
+            </div>
+            <div>
+              <div class="form-label h6">{__("Woovi / OpenPix Enabled")}</div>
+              <div class="form-text d-none d-sm-block">{__("Enable Pix charges through Woovi")}</div>
+            </div>
+            <div class="text-end">
+              <label class="switch" for="woovi_enabled">
+                <input type="checkbox" name="woovi_enabled" id="woovi_enabled" {if $system['woovi_enabled']}checked{/if}>
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+          <div class="mt20">
+            <div class="form-group">
+              <label class="form-label">{__("Environment")}</label>
+              <select class="form-select" name="woovi_mode">
+                <option value="sandbox" {if $system['woovi_mode'] == "sandbox"}selected{/if}>{__("Sandbox (testing)")}</option>
+                <option value="production" {if $system['woovi_mode'] == "production"}selected{/if}>{__("Production")}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">AppID</label>
+              {if !$user->_data['user_demo']}
+                <input type="password" class="form-control" name="woovi_app_id" value="" autocomplete="new-password" placeholder="{if $system['woovi_app_id']}{__("Configured — leave blank to keep")}{else}{__("Woovi API AppID")}{/if}">
+              {else}
+                <input type="password" class="form-control" value="*********" disabled>
+              {/if}
+              <div class="form-text">{__("The AppID stays on the server and is never sent to the browser.")}</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">{__("Pix expiration (seconds)")}</label>
+              <input type="number" min="300" max="2592000" class="form-control" name="woovi_charge_expiration_seconds" value="{$system['woovi_charge_expiration_seconds']}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">{__("Webhook URL")}</label>
+              <input type="text" readonly class="form-control" value="{$system['system_url']}/webhooks/woovi.php">
+              <div class="form-text">{__("Register this HTTPS URL in Woovi for OPENPIX:CHARGE_COMPLETED. RSA signature validation is automatic.")}</div>
+            </div>
+          </div>
+        </div>
+        <!-- Brazilian Gateways -->
+
+        <div class="divider"></div>
+
+
         <!-- Plisio -->
         <div>
           <div class="form-table-row">

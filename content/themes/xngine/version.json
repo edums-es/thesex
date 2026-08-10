@@ -1,5 +1,5 @@
 {
-  "version": "1.6.2-thesex.5",
+  "version": "1.6.2-thesex.6",
   "sngine": "4.4.2",
-  "changelog": "Premium creator profiles, conversion actions and private creator dashboard"
+  "changelog": "Secure Stone/Pagar.me V5 and Woovi/OpenPix hosted payments with idempotent webhooks"
 }
