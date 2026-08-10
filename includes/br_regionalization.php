@@ -53,7 +53,7 @@ function br_regionalization_apply()
       ON DUPLICATE KEY UPDATE country_code = 'BR', country_name = 'Brasil', phone_code = '+55', `default` = '1', enabled = '1', country_order = 1");
     br_regionalization_query("UPDATE users SET user_country = " . BR_COUNTRY_ID . ", user_language = 'pt_br'");
     br_regionalization_query("UPDATE pages SET page_country = " . BR_COUNTRY_ID);
-    br_regionalization_query("UPDATE groups SET group_country = " . BR_COUNTRY_ID);
+    br_regionalization_query("UPDATE `groups` SET group_country = " . BR_COUNTRY_ID);
     br_regionalization_query("UPDATE events SET event_country = " . BR_COUNTRY_ID);
     br_regionalization_query("UPDATE ads_campaigns SET audience_countries = '" . BR_COUNTRY_ID . "' WHERE audience_countries <> ''");
     br_regionalization_query("DELETE FROM auto_connect WHERE country_id <> " . BR_COUNTRY_ID);
@@ -77,7 +77,7 @@ function br_regionalization_apply()
       VALUES (" . BR_LANGUAGE_ID . ", 'pt_br', 'Português (Brasil)', 'flags/pt_br.png', 'LTR', '1', '1', 1)
       ON DUPLICATE KEY UPDATE code = 'pt_br', title = 'Português (Brasil)', flag = 'flags/pt_br.png', dir = 'LTR', `default` = '1', enabled = '1', language_order = 1");
     br_regionalization_query("UPDATE pages SET page_language = " . BR_LANGUAGE_ID);
-    br_regionalization_query("UPDATE groups SET group_language = " . BR_LANGUAGE_ID);
+    br_regionalization_query("UPDATE `groups` SET group_language = " . BR_LANGUAGE_ID);
     br_regionalization_query("UPDATE events SET event_language = " . BR_LANGUAGE_ID);
     br_regionalization_query("UPDATE widgets SET language_id = " . BR_LANGUAGE_ID . " WHERE language_id <> 0");
     br_regionalization_query("DELETE FROM system_languages WHERE language_id NOT IN (" . EN_FALLBACK_LANGUAGE_ID . ", " . BR_LANGUAGE_ID . ")");
